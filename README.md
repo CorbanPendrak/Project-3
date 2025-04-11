@@ -64,4 +64,5 @@ Preliminary algorithms or data structures we may want to implement and how we re
 - [x] Create GitHub repository
 - [x] Document repository
 - [x] Style repository
+- [x] Setup SFML
 - [ ] Program flow design
