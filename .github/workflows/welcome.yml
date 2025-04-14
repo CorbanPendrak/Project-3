@@ -1,18 +1,16 @@
-name: Post welcome comment
+name: Welcome comment
 
-on:
-  pull_request:
-    types: [opened]
-
-permissions:
-  pull-requests: write
+on: [pull_request_target, issues]
 
 jobs:
-  build:
-    name: Post welcome comment
+  greeting:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
     steps:
-      - run: gh pr comment $PR_URL --body "This is an automated comment for interaction to make it seem like we will review your code soon, when in reality this will probably sit for a while before we even notice it! Thank you from the developers!"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: "Congrats, you spotted an issue. To be honest, this is a side project for homework, so don't expect regular maintenance."
+          pr-message: "Thank you for your pull request. We will diligently look review it for effectiveness. Ugh, seriously? Why do we even get pull requests? Come on! Oh, wait, did I turn of the transcriber? There...CLICK"
