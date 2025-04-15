@@ -35,7 +35,8 @@ add_executable(Project_3
 
 # These tests can use the Catch2-provided main
 add_executable(Tests
-        Tests/test.cpp # main test file
+        Tests/test.cpp
+        Tests/test-sfml.cpp # main test file
         # add your own header files below - should be automatically added in CLion
         # example (can also separate with newlines):
         # src/AVL.h src/AVL.cpp
@@ -43,7 +44,8 @@ add_executable(Tests
 
 target_compile_features(Project_3 PRIVATE cxx_std_17)
 target_link_libraries(Project_3 PRIVATE SFML::Graphics)
-target_link_libraries(Tests PRIVATE Catch2::Catch2WithMain) #link catch to test.cpp file
+target_link_libraries(Tests PRIVATE Catch2::Catch2WithMain) # link catch to test.cpp file
+target_link_libraries(Tests PRIVATE SFML::Graphics) # link sfml to test.cpp file
 # the name here must match that of your testing executable (the one that has test.cpp)
 
 # comment everything below out if you are using CLion
