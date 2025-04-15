@@ -4,8 +4,14 @@ project(Project_3)
 set(CMAKE_CXX_STANDARD 20)
 
 # compile flags to match Gradescope test environment
-set(GCC_COVERAGE_COMPILE_FLAGS "-Wall -Werror") # remove -Wall if you don't want as many warnings treated as errors
-# gradescope does use -Werror, so if you remove it here you may run into issues when trying to submit
+# Check if we are on a Windows platform
+if (WIN32)
+    # No /Werror flag for Windows compilers
+else()
+    # Add /Werror flag for non-Windows platforms
+    set(GCC_COVERAGE_COMPILE_FLAGS "-Wall -Werror") # remove -Wall if you don't want as many warnings treated as errors
+    # gradescope does use -Werror, so if you remove it here you may run into issues when trying to submit
+endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}" )
 
 include(FetchContent)
