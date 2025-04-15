@@ -1,8 +1,11 @@
 ![](./Docs/header.svg)
 
 
-**Team Name**: Fluffy Llama\
+**Team Name**: Fluffy Llama \
 **Team Members**: Adan Alter, Corban Pendrak, Timmy Loos
+<p align="center">
+<img src="./Docs/team.png" alt="team picture" width="75%"></img>
+</p>
 
 ## What problem are we trying to solve?
 Create an easy method to search the U.S. Department of Health & Human Services Nutritional Dataset by relevant divisions.
