@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="1647.1019mm"
+   height="202.93907mm"
+   viewBox="0 0 1647.1019 202.93907"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="Unnamed document 1"
+   inkscape:export-filename="header.png"
+   inkscape:export-xdpi="121.00878"
+   inkscape:export-ydpi="121.00878"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="mm"
+     showguides="true">
+    <inkscape:page
+       x="0"
+       y="0"
+       width="1647.1019"
+       height="202.93907"
+       id="page2"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <filter
+       style="color-interpolation-filters:sRGB"
+       inkscape:label="Blur"
+       id="filter2"
+       x="-0.0093847463"
+       y="-0.088826073"
+       width="1.0187695"
+       height="1.1776521">
+      <feGaussianBlur
+         stdDeviation="3.12495 3"
+         result="fbSourceGraphic"
+         id="feGaussianBlur2" />
+      <feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix2" />
+      <feGaussianBlur
+         id="feGaussianBlur3"
+         stdDeviation="3.12495 3"
+         result="blur"
+         in="fbSourceGraphic" />
+    </filter>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(694.15638,-67.442718)">
+    <rect
+       style="fill:#fb6502;fill-opacity:1;stroke:none;stroke-width:2.117;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter2)"
+       id="rect2"
+       width="1598.3127"
+       height="162.11456"
+       x="-660.367"
+       y="93.867233"
+       ry="26.204107" />
+    <rect
+       style="fill:#00529b;fill-opacity:1;stroke:none;stroke-width:2.117;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1"
+       width="1598.3127"
+       height="162.11456"
+       x="-694.15637"
+       y="67.442719"
+       ry="26.204107" />
+    <text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:141.111px;font-family:Rajdhani;-inkscape-font-specification:'Rajdhani, Bold';text-align:center;letter-spacing:0px;writing-mode:lr-tb;direction:ltr;text-anchor:middle;white-space:pre;inline-size:1577.87;fill:none;stroke:#000000;stroke-width:2.11667;stroke-linecap:round;stroke-linejoin:round"
+       x="-99.370186"
+       y="74.17775"
+       id="text1"
+       transform="translate(202.81791,123.92276)"><tspan
+         x="-99.370186"
+         y="74.17775"
+         id="tspan3"><tspan
+           style="fill:#ffffff;stroke:#ffffff"
+           id="tspan2">General Nutritional Biases</tspan></tspan></text>
+  </g>
+</svg>
