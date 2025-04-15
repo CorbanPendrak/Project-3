@@ -74,7 +74,7 @@ Here are the steps for programming. Please follow them to ensure consistent code
 - [ ] Setup Dependencies
   - [x] Setup SFML @CorbanPendrak
   - [ ] Precommit hook to reformat code
-  - [ ] Setup Catch
-  - [ ] Create SFML Catch test
+  - [x] Setup Catch
+  - [x] Create SFML Catch test
   - [ ] Setup code coverage
 - [ ] Program flow design
