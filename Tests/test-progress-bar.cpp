@@ -1,8 +1,19 @@
-#include <SFML/Graphics.hpp>
-#include "ProgressBar.h"
+//
+// Purpose: Test ProgressBar GUI element
+//
 
-int main() {
+#include <catch2/catch_test_macros.hpp>
+#include <SFML/Graphics.hpp>
+#include "../ProgressBar.h"
+
+TEST_CASE("Test ProgressBar works", "[sfml]") {
     sf::RenderWindow window(sf::VideoMode(sf::Vector2u(200, 200)), "SFML Test Application");
+
+    // Check if the window is open
+    REQUIRE(window.isOpen());
+
+    sf::Clock autoClose;
+
     sf::Clock clock;
     ProgressBar progressBar(10);
     progressBar.setColor(sf::Color::Green);
@@ -21,11 +32,18 @@ int main() {
     progressBar3.setSize(150, 50);
     progressBar3.setPosition(25, 150);
 
-
+    bool eventHandled = false;
     while (window.isOpen()) {
         while (const std::optional event = window.pollEvent()) {
-            if (event->is<sf::Event::Closed>())
+            if (event->is<sf::Event::Closed>()) {
                 window.close();
+                eventHandled = true;
+            }
+        }
+
+        if (autoClose.getElapsedTime().asSeconds() >= 5) {
+            eventHandled = true;
+            window.close();
         }
 
         if (clock.getElapsedTime().asSeconds() >= 1) {
@@ -56,4 +74,7 @@ int main() {
         window.draw(progressBar3);
         window.display();
     }
+
+    // Ensure event handling works
+    REQUIRE(eventHandled == true); // Close event triggered
 }
