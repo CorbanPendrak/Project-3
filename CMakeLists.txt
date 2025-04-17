@@ -46,7 +46,8 @@ add_executable(Tests
         Tests/test.cpp
         Tests/test-sfml.cpp
         ProgressBar.cpp
-        ProgressBar.h # main test file
+        ProgressBar.h
+        Tests/test-progress-bar.cpp
         # add your own header files below - should be automatically added in CLion
         # example (can also separate with newlines):
         # src/AVL.h src/AVL.cpp
