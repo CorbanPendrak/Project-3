@@ -34,6 +34,8 @@ FetchContent_MakeAvailable(Catch2)
 
 add_executable(Project_3
         main.cpp
+        ProgressBar.cpp
+        ProgressBar.h
         # add your own header files below - should be automatically added in CLion
         # example (can also separate with newlines):
         # src/AVL.h src/AVL.cpp
@@ -42,7 +44,9 @@ add_executable(Project_3
 # These tests can use the Catch2-provided main
 add_executable(Tests
         Tests/test.cpp
-        Tests/test-sfml.cpp # main test file
+        Tests/test-sfml.cpp
+        ProgressBar.cpp
+        ProgressBar.h # main test file
         # add your own header files below - should be automatically added in CLion
         # example (can also separate with newlines):
         # src/AVL.h src/AVL.cpp

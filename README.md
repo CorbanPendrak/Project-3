@@ -78,3 +78,4 @@ Here are the steps for programming. Please follow them to ensure consistent code
   - [x] Create SFML Catch test
   - [ ] Setup code coverage
 - [ ] Program flow design
+- [x] Create progress bar GUI element
