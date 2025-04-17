@@ -87,6 +87,7 @@ void ProgressBar::add() {
  */
 void ProgressBar::clear() {
     this->progress = 0;
+    this->progressShape.setSize(sf::Vector2f(0, 0));
 }
 
 /*
