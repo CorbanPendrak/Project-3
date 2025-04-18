@@ -21,10 +21,8 @@ void BasicHashTable::load(std::atomic<int>& progress, std::string fileName) {
 
     std::string line;
     std::getline(file, line); // Ignore headers
-    int count = 0;
     while (std::getline(file, line)) {
 
-        std::getline(file, line);
         std::stringstream ss(line);
         std::vector<std::string> row;
         std::string cell;
@@ -39,8 +37,6 @@ void BasicHashTable::load(std::atomic<int>& progress, std::string fileName) {
         }
         data[row[7]][row[2]].push_back(std::stof(row[10]));
         progress++;
-        count++;
-        std::cout << count << std::endl;
     }
     progress = -1;
     std::getline(file, line);
@@ -71,7 +67,6 @@ void BasicHashTable::load(std::atomic<int>& progress, std::string fileName, int 
             break;
         }
 
-        std::getline(file, line);
         std::stringstream ss(line);
         std::vector<std::string> row;
         std::string cell;

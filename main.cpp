@@ -72,43 +72,13 @@ void printDataAnalysis(std::vector<float> data) {
         sum += elem;
     }
 
-    std::cout << "Minimum value: " << std::fixed << std::setprecision(2) << min << std::endl
-        << "Maximum value: " << std::fixed << std::setprecision(2) << max << std::endl
-        << "Average: " << std::fixed << std::setprecision(2) << sum / data.size() << std::endl
-        << "Sample size: " << std::fixed << std::setprecision(2) << data.size() << std::endl;
+    std::cout << "\t\tMinimum value: " << std::fixed << std::setprecision(2) << min
+        << "\n\t\tMaximum value: " << std::fixed << std::setprecision(2) << max
+        << "\n\t\tAverage: " << std::fixed << std::setprecision(2) << sum / data.size()
+        << "\n\t\tSample size: " << std::fixed << std::setprecision(2) << data.size() << std::endl;
 }
-
 
 int main() {
-    std::cout << "Count: ";
-    std::ifstream file;
-    file.open("Nutrition__Physical_Activity__and_Obesity_-_Behavioral_Risk_Factor_Surveillance_System.csv");
-    if (!file.is_open()) {
-        return 0;
-    }
-    std::string line;
-    std::getline(file, line); // Ignore headers
-    int count = 0;
-    while (std::getline(file, line)) {
-
-        std::getline(file, line);
-        std::stringstream ss(line);
-        std::vector<std::string> row;
-        std::string cell;
-        /*
-        while (std::getline(ss, cell, ',')) {
-            row.push_back(cell);
-        }
-        */
-        count++;
-    }
-
-    std::cout << count << std::endl;
-
-    return 0;
-}
-
-int main2() {
     std::string fileName = "Nutrition__Physical_Activity__and_Obesity_-_Behavioral_Risk_Factor_Surveillance_System.csv";
     std::cout << "*-------------------------------------------------------------------------*\n"
                  "| U.S. Department of Health & Human Services Nutritional Dataset Analysis |\n"
@@ -159,7 +129,6 @@ int main2() {
         hashtable->progressBar->clear();
         hashtable->progressBar->add(currentProgress);
         window.draw(*hashtable->progressBar);
-        std::cout << static_cast<float>(currentProgress) / 100000 << std::endl;
         window.display();
     }
 
@@ -195,7 +164,8 @@ int main2() {
         std::vector<float> result = hashtable->search(question, state);
 
         // Print result
-        std::cout << question << "\n\t" << state << "\n\t\t<";
+        std::cout << question << "\n\t" << state << "\n";
+        /*
         for (unsigned int i = 0; i < result.size(); i++) {
             if (i == 0) {
                 std::cout << std::fixed << std::setprecision(2) << result[i];
@@ -206,6 +176,7 @@ int main2() {
             }
         }
         std::cout << ">" << "\n";
+        */
         printDataAnalysis(result);
         std::cout << std::endl;
     }
@@ -218,4 +189,3 @@ int main2() {
 
 // Todo: add timing
 // Todo: add tests
-// Todo: Why not loading all entries?
