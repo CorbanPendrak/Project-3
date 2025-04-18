@@ -10,7 +10,7 @@
 /*
  * Purpose: Load entire data from file
  */
-void BasicHashTable::load(std::string fileName) {
+void BasicHashTable::load(std::atomic<int>& progress, std::string fileName) {
     // Open file
     std::ifstream file;
     file.open(fileName);
@@ -21,6 +21,7 @@ void BasicHashTable::load(std::string fileName) {
 
     std::string line;
     std::getline(file, line); // Ignore headers
+    int count = 0;
     while (std::getline(file, line)) {
 
         std::getline(file, line);
@@ -31,17 +32,27 @@ void BasicHashTable::load(std::string fileName) {
         while (std::getline(ss, cell, ',')) {
             row.push_back(cell);
         }
-        if (row[7].empty() || row[2].empty() || row[10].empty()) {
+        if (row[7].empty() || row[2].empty()) {
             continue;
+        } else if (row[10].empty()) {
+            row[10] = "0";
         }
         data[row[7]][row[2]].push_back(std::stof(row[10]));
+        progress++;
+        count++;
+        std::cout << count << std::endl;
     }
+    progress = -1;
+    std::getline(file, line);
+    std::cout << line;
+
+    file.close();
 }
 
 /*
  * Purpose: Load specific number of dataset
  */
-void BasicHashTable::load(std::string fileName, int maxLoad) {
+void BasicHashTable::load(std::atomic<int>& progress, std::string fileName, int maxLoad) {
     // Open file
     std::ifstream file;
     file.open(fileName);
@@ -68,12 +79,16 @@ void BasicHashTable::load(std::string fileName, int maxLoad) {
         while (std::getline(ss, cell, ',')) {
             row.push_back(cell);
         }
-        if (row[7].empty() || row[2].empty() || row[10].empty()) {
+        if (row[7].empty() || row[2].empty()) {
             continue;
+        } else if (row[10].empty()) {
+            row[10] = "0";
         }
         data[row[7]][row[2]].push_back(std::stof(row[10]));
         count++;
+        progress++;
     }
+    progress = -1;
 }
 
 /*

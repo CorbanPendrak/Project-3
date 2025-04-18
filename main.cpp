@@ -3,7 +3,9 @@
 #include "BasicHashTable.h"
 #include <string>
 #include <algorithm>
+#include <fstream>
 #include <iomanip>
+#include <thread>
 
 std::string verifyOption(std::string name, const std::vector<std::string> &options, int cols = 1) {
     std::cout << "  " << name << std::endl
@@ -78,6 +80,35 @@ void printDataAnalysis(std::vector<float> data) {
 
 
 int main() {
+    std::cout << "Count: ";
+    std::ifstream file;
+    file.open("Nutrition__Physical_Activity__and_Obesity_-_Behavioral_Risk_Factor_Surveillance_System.csv");
+    if (!file.is_open()) {
+        return 0;
+    }
+    std::string line;
+    std::getline(file, line); // Ignore headers
+    int count = 0;
+    while (std::getline(file, line)) {
+
+        std::getline(file, line);
+        std::stringstream ss(line);
+        std::vector<std::string> row;
+        std::string cell;
+        /*
+        while (std::getline(ss, cell, ',')) {
+            row.push_back(cell);
+        }
+        */
+        count++;
+    }
+
+    std::cout << count << std::endl;
+
+    return 0;
+}
+
+int main2() {
     std::string fileName = "Nutrition__Physical_Activity__and_Obesity_-_Behavioral_Risk_Factor_Surveillance_System.csv";
     std::cout << "*-------------------------------------------------------------------------*\n"
                  "| U.S. Department of Health & Human Services Nutritional Dataset Analysis |\n"
@@ -98,7 +129,43 @@ int main() {
         hashtable = &basicHashTable;
     }
 
-    hashtable->load(fileName);
+    // Load data
+    sf::RenderWindow window(sf::VideoMode(sf::Vector2u(170, 70)), "SFML Test Application");
+    std::cout << window.setActive(false);
+    //std::thread thread(&renderingThread, &window, &hashtable);
+    std::atomic<int> progress(0);
+    std::thread worker([&]() {hashtable->load(progress, fileName);});
+
+    // activate the window's context
+    std::cout << window.setActive(true);
+
+    // the rendering loop
+    hashtable->progressBar->setSize(150, 50);
+    hashtable->progressBar->setPosition(10, 10);
+    while (window.isOpen())
+    {
+        while (const std::optional event = window.pollEvent()) {
+            if (event->is<sf::Event::Closed>()) {
+                window.close();
+            }
+        }
+
+        int currentProgress = progress.load();
+        if (currentProgress == -1) {
+            window.close();
+        }
+
+        window.clear();
+        hashtable->progressBar->clear();
+        hashtable->progressBar->add(currentProgress);
+        window.draw(*hashtable->progressBar);
+        std::cout << static_cast<float>(currentProgress) / 100000 << std::endl;
+        window.display();
+    }
+
+    /*if (worker.joinable()) {
+        worker.join();
+    }*/
 
     // Query
     while (true) {
@@ -144,4 +211,11 @@ int main() {
     }
 
     std::cout << "Goodbye!" << std::endl;
+
+     return 0;
 }
+
+
+// Todo: add timing
+// Todo: add tests
+// Todo: Why not loading all entries?
