@@ -22,6 +22,7 @@ public:
     void MergeSort(vector<double>& arr, double left, double right);
     void quick();
     void heap();
+    void sleep();
 };
 
 #endif //PROJECT_3_SORTALGORITHMS_H

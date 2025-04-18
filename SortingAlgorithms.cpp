@@ -51,3 +51,12 @@ Input: ;*/
 void SortingAlgorithms::heap() {
     ;
 }
+
+/*
+
+Purpose: Implementation of the sleep sort algorithm
+Input: ;*/
+
+void SortingAlgorithms::sleep() {
+    ;
+}
