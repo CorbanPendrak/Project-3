@@ -31,10 +31,10 @@ void BasicHashTable::load(std::string fileName) {
         while (std::getline(ss, cell, ',')) {
             row.push_back(cell);
         }
-        if (row[7].empty() || row[3].empty() || row[10].empty()) {
+        if (row[7].empty() || row[2].empty() || row[10].empty()) {
             continue;
         }
-        data[row[7]][row[3]].push_back(std::stof(row[10]));
+        data[row[7]][row[2]].push_back(std::stof(row[10]));
     }
 }
 
@@ -68,14 +68,17 @@ void BasicHashTable::load(std::string fileName, int maxLoad) {
         while (std::getline(ss, cell, ',')) {
             row.push_back(cell);
         }
-        if (row[7].empty() || row[3].empty() || row[10].empty()) {
+        if (row[7].empty() || row[2].empty() || row[10].empty()) {
             continue;
         }
-        data[row[7]][row[3]].push_back(std::stof(row[10]));
+        data[row[7]][row[2]].push_back(std::stof(row[10]));
         count++;
     }
 }
 
+/*
+ * Purpose: Basic search through data
+ */
 std::vector<float> BasicHashTable::search(std::string question, std::string state) {
     // Key-value pair for question-states
     auto questionStatesPair = data.find(question);
@@ -96,4 +99,26 @@ std::vector<float> BasicHashTable::search(std::string question, std::string stat
 
     // Return empty vector
     return std::vector<float>();
+}
+
+/*
+ * Purpose: Get available states for question
+ */
+std::vector<std::string> BasicHashTable::searchStates(std::string question) {
+    // Key-value pair for question-states
+    auto questionStatesPair = data.find(question);
+
+    // Check key exists
+    if (questionStatesPair != data.end()) {
+        std::vector<std::string> availableStates;
+
+        for (auto stateResultsPair : questionStatesPair->second) {
+            availableStates.push_back(stateResultsPair.first);
+        }
+
+        return availableStates;
+    }
+
+    // Question not found
+    return std::vector<std::string>();
 }

@@ -18,6 +18,7 @@ public:
     void load(std::string fileName, int maxLoad);
 
     std::vector<float> search(std::string question, std::string state);
+    std::vector<std::string> searchStates(std::string question);
 };
 
 
