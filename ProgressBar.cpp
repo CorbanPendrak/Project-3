@@ -91,10 +91,26 @@ void ProgressBar::clear() {
 }
 
 /*
+ * Purpose: Change end
+ */
+void ProgressBar::changeEnd(float end) {
+    this->end = end;
+    // Recalculate interval
+    add(0);
+}
+
+/*
  * Purpose: Get progress
  */
 float ProgressBar::getProgress() const {
     return progress / end;
+}
+
+/*
+ * Purpose: Get end
+ */
+float ProgressBar::getEnd() const {
+    return end;
 }
 
 /*

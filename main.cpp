@@ -3,6 +3,8 @@
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(sf::Vector2u(200, 200)), "SFML Test Application");
+    sf::Clock resize;
+
     sf::Clock clock;
     ProgressBar progressBar(10);
     progressBar.setColor(sf::Color::Green);
@@ -26,6 +28,12 @@ int main() {
         while (const std::optional event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>())
                 window.close();
+        }
+        if (resize.getElapsedTime().asSeconds() >= 10) {
+            progressBar.changeEnd(progressBar.getEnd() * 1.5);
+            progressBar2.changeEnd(progressBar2.getEnd() * 1.5);
+            progressBar3.changeEnd(progressBar3.getEnd() * 1.5);
+            resize.restart();
         }
 
         if (clock.getElapsedTime().asSeconds() >= 1) {

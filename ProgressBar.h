@@ -15,13 +15,15 @@ private:
     sf::RectangleShape outlineShape;
 
 public:
-    ProgressBar(float end);
+    ProgressBar(float end = 1);
 
     void add();
     void add(int interval);
     void clear();
+    void changeEnd(float end);
 
     float getProgress() const;
+    float getEnd() const;
 
     void setSize(sf::Vector2f size);
     void setSize(float x, float y);
