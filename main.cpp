@@ -13,7 +13,7 @@ std::string verifyOption(std::string name, const std::vector<std::string> &optio
 
     for (unsigned int i = 0; i < (options.size() ) / cols; i++) {
         std::cout << i+1 << ". " << options[i];
-        for (unsigned int j = 1; j < cols; j++) {
+        for (int j = 1; j < cols; j++) {
             if (i + ((options.size() + 1) / (j + 1)) >= options.size()) {
                 break;
             }
@@ -22,7 +22,7 @@ std::string verifyOption(std::string name, const std::vector<std::string> &optio
         std::cout << std::endl;
     }
     if (cols > 1) {
-        for (unsigned int i = 1; i < cols; i++) {
+        for (int i = 1; i < cols; i++) {
             std::cout << (options.size() + 1) / cols << ". " << options[(options.size() + 1) / cols - 1];
         }
         std::cout << std::endl;
@@ -33,7 +33,7 @@ std::string verifyOption(std::string name, const std::vector<std::string> &optio
     std::string option = "";
     while (true) {
         std::cout << name << ": ";
-        int optionNumber;
+        long unsigned int optionNumber;
         if (!(std::cin >> optionNumber)) {
             std::cin.clear();
             std::cin.ignore();
@@ -166,7 +166,7 @@ int main() {
         // Print result
         std::cout << question << "\n\t" << state << "\n";
         /*
-        for (unsigned int i = 0; i < result.size(); i++) {
+        for (int i = 0; i < result.size(); i++) {
             if (i == 0) {
                 std::cout << std::fixed << std::setprecision(2) << result[i];
             } else if (i % 20 == 0) {
