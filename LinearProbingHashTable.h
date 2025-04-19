@@ -8,7 +8,7 @@
 #include "HashTable.h"
 #include <vector>
 #include <string>
-#include <utility> // for std::pair
+#include <atomic>
 
 class LinearProbingHashTable : public HashTable {
 private:
@@ -23,17 +23,19 @@ private:
     int capacity;
     int size;
 
-    int hash(std::string key); // hash function
-    int probe(std::string key); // linear probing
-
-    void resize();
+    int hash(const std::string& key);      // Hash function
+    int probe(const std::string& key);     // Linear probing logic
+    void resize();                         // Resize when load factor is high
 
 public:
-    LinearProbingHashTable(int initialSize = 200003); // use a large prime number
-    void load(std::string fileName) override;
-    void load(std::string fileName, int maxLoad) override;
+    explicit LinearProbingHashTable(int initialSize = 200003); // Default large prime capacity
+    void load(std::atomic<int>& progress, std::string fileName) override;
+    void load(std::atomic<int>& progress, std::string fileName, int maxLoad) override;
+
+
     std::vector<float> search(std::string question, std::string state) override;
     std::vector<std::string> searchStates(std::string question) override;
 };
 
 #endif // LINEARPROBINGHASHTABLE_H
+

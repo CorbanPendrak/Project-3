@@ -10,29 +10,31 @@
 LinearProbingHashTable::LinearProbingHashTable(int initialSize)
     : capacity(initialSize), size(0) {
     table.resize(capacity);
+    this->progressBar = new ProgressBar(104273); // match BasicHashTable
 }
 
-int LinearProbingHashTable::hash(std::string key) {
-    // djb2 string hash function
+
+int LinearProbingHashTable::hash(const std::string& key) {
     unsigned long hash = 5381;
     for (char c : key)
         hash = ((hash << 5) + hash) + c;
     return hash % capacity;
 }
 
-int LinearProbingHashTable::probe(std::string key) {
+int LinearProbingHashTable::probe(const std::string& key) {
     int idx = hash(key);
     int originalIdx = idx;
 
     while (table[idx].isOccupied && (table[idx].question + "|" + table[idx].state) != key) {
         idx = (idx + 1) % capacity;
-        if (idx == originalIdx) return -1; // table full
+        if (idx == originalIdx) return -1; // full
     }
 
     return idx;
 }
 
-void LinearProbingHashTable::load(std::string fileName) {
+
+void LinearProbingHashTable::load(std::atomic<int>& progress, std::string fileName) {
     std::ifstream file(fileName);
     if (!file.is_open()) {
         std::cout << "Error opening file " << fileName << std::endl;
@@ -42,6 +44,7 @@ void LinearProbingHashTable::load(std::string fileName) {
     std::string line;
     std::getline(file, line); // skip headers
 
+    int count = 0;
     while (std::getline(file, line)) {
         std::stringstream ss(line);
         std::vector<std::string> row;
@@ -72,10 +75,14 @@ void LinearProbingHashTable::load(std::string fileName) {
             table[idx].isOccupied = true;
             size++;
         }
+
+        progress = ++count;
     }
+
+    progress = -1; // signal done
 }
 
-void LinearProbingHashTable::load(std::string fileName, int maxLoad) {
+void LinearProbingHashTable::load(std::atomic<int>& progress, std::string fileName, int maxLoad) {
     std::ifstream file(fileName);
     if (!file.is_open()) {
         std::cout << "Error opening file " << fileName << std::endl;
@@ -117,8 +124,10 @@ void LinearProbingHashTable::load(std::string fileName, int maxLoad) {
             size++;
         }
 
-        count++;
+        progress = ++count;
     }
+
+    progress = -1; // signal done
 }
 
 std::vector<float> LinearProbingHashTable::search(std::string question, std::string state) {

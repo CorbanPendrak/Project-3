@@ -1,17 +1,21 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "BasicHashTable.h"
+#include "LinearProbingHashTable.h"
+#include <chrono>
 #include <string>
 #include <algorithm>
+#include <fstream>
 #include <iomanip>
+#include <thread>
 
 std::string verifyOption(std::string name, const std::vector<std::string> &options, int cols = 1) {
     std::cout << "  " << name << std::endl
                  << "-------------\n";
 
-    for (unsigned int i = 0; i < (options.size() ) / cols; i++) {
+    for (int i = 0; i < static_cast<int>(options.size() / cols); i++) {
         std::cout << i+1 << ". " << options[i];
-        for (unsigned int j = 1; j < cols; j++) {
+        for (int j = 1; j < cols; j++) {
             if (i + ((options.size() + 1) / (j + 1)) >= options.size()) {
                 break;
             }
@@ -20,7 +24,7 @@ std::string verifyOption(std::string name, const std::vector<std::string> &optio
         std::cout << std::endl;
     }
     if (cols > 1) {
-        for (unsigned int i = 1; i < cols; i++) {
+        for (int i = 1; i < cols; i++) {
             std::cout << (options.size() + 1) / cols << ". " << options[(options.size() + 1) / cols - 1];
         }
         std::cout << std::endl;
@@ -31,7 +35,7 @@ std::string verifyOption(std::string name, const std::vector<std::string> &optio
     std::string option = "";
     while (true) {
         std::cout << name << ": ";
-        int optionNumber;
+        long unsigned int optionNumber;
         if (!(std::cin >> optionNumber)) {
             std::cin.clear();
             std::cin.ignore();
@@ -70,12 +74,12 @@ void printDataAnalysis(std::vector<float> data) {
         sum += elem;
     }
 
-    std::cout << "Minimum value: " << std::fixed << std::setprecision(2) << min << std::endl
-        << "Maximum value: " << std::fixed << std::setprecision(2) << max << std::endl
-        << "Average: " << std::fixed << std::setprecision(2) << sum / data.size() << std::endl
-        << "Sample size: " << std::fixed << std::setprecision(2) << data.size() << std::endl;
+    std::cout
+        << "\t\tAverage: " << std::fixed << std::setprecision(2) << sum / data.size()
+        << "\n\t\tMinimum value: " << std::fixed << std::setprecision(2) << min
+        << "\n\t\tMaximum value: " << std::fixed << std::setprecision(2) << max
+        << "\n\t\tSample size: " << std::fixed << std::setprecision(2) << data.size() << std::endl;
 }
-
 
 int main() {
     std::string fileName = "Nutrition__Physical_Activity__and_Obesity_-_Behavioral_Risk_Factor_Surveillance_System.csv";
@@ -86,19 +90,93 @@ int main() {
     // Load data
     std::vector<std::string> hashTables = {
         "Basic Hash Table",
+        "Linear Probing Hash Table"
     };
+
     std::string hashTableChoice = verifyOption("Hash Table", hashTables);
 
     HashTable* hashtable;
     if (hashTableChoice == "Basic Hash Table") {
-        BasicHashTable basicHashTable;
-        hashtable = &basicHashTable;
+        hashtable = new BasicHashTable();
+    } else if (hashTableChoice == "Linear Probing Hash Table") {
+        hashtable = new LinearProbingHashTable();
     } else {
-        BasicHashTable basicHashTable;
-        hashtable = &basicHashTable;
+        std::cout << "Invalid choice.\n";
+        return 1;
     }
 
-    hashtable->load(fileName);
+
+    // Load data
+    sf::RenderWindow window(sf::VideoMode(sf::Vector2u(170, 70)), "SFML Test Application");
+    std::atomic<int> progress(0);
+    double loadTime = 0.0;
+
+    std::thread worker([&]() {
+        auto start = std::chrono::high_resolution_clock::now();
+        hashtable->load(progress, fileName);
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed = end - start;
+        loadTime = elapsed.count();
+    });
+
+    // progress bar settings
+    hashtable->progressBar->setSize(150, 50);
+    hashtable->progressBar->setPosition(10, 10);
+
+    // SFML render loop
+    while (window.isOpen()) {
+        while (const std::optional event = window.pollEvent()) {
+            if (event->is<sf::Event::Closed>()) {
+                window.close();
+            }
+        }
+
+        int currentProgress = progress.load();
+        if (currentProgress == -1) {
+            window.close();
+        }
+
+        window.clear();
+        hashtable->progressBar->clear();
+        hashtable->progressBar->add(currentProgress);
+        window.draw(*hashtable->progressBar);
+        window.display();
+    }
+
+    // wait for thread to finish
+    if (worker.joinable()) {
+        worker.join();
+    }
+
+    std::cout << "Load time: " << loadTime << " seconds\n";
+
+
+    // the rendering loop
+    hashtable->progressBar->setSize(150, 50);
+    hashtable->progressBar->setPosition(10, 10);
+    while (window.isOpen())
+    {
+        while (const std::optional event = window.pollEvent()) {
+            if (event->is<sf::Event::Closed>()) {
+                window.close();
+            }
+        }
+
+        int currentProgress = progress.load();
+        if (currentProgress == -1) {
+            window.close();
+        }
+
+        window.clear();
+        hashtable->progressBar->clear();
+        hashtable->progressBar->add(currentProgress);
+        window.draw(*hashtable->progressBar);
+        window.display();
+    }
+
+    if (worker.joinable()) {
+        worker.join();
+    }
 
     // Query
     while (true) {
@@ -128,8 +206,9 @@ int main() {
         std::vector<float> result = hashtable->search(question, state);
 
         // Print result
-        std::cout << question << "\n\t" << state << "\n\t\t<";
-        for (unsigned int i = 0; i < result.size(); i++) {
+        std::cout << question << "\n\t" << state << "\n";
+        /*
+        for (int i = 0; i < result.size(); i++) {
             if (i == 0) {
                 std::cout << std::fixed << std::setprecision(2) << result[i];
             } else if (i % 20 == 0) {
@@ -139,9 +218,18 @@ int main() {
             }
         }
         std::cout << ">" << "\n";
+        */
         printDataAnalysis(result);
         std::cout << std::endl;
     }
 
     std::cout << "Goodbye!" << std::endl;
+
+    delete hashtable;
+
+    return 0;
 }
+
+
+// Todo: add timing
+// Todo: add tests
