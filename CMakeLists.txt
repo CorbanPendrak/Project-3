@@ -39,6 +39,8 @@ add_executable(Project_3
         BasicHashTable.cpp
         BasicHashTable.h
         HashTable.h
+        OrderedMapTable.cpp
+        OrderedMapTable.h
         # add your own header files below - should be automatically added in CLion
         # example (can also separate with newlines):
         # src/AVL.h src/AVL.cpp
@@ -51,6 +53,8 @@ add_executable(Tests
         ProgressBar.cpp
         ProgressBar.h
         Tests/test-progress-bar.cpp
+        OrderedMapTable.cpp
+        OrderedMapTable.h
         # add your own header files below - should be automatically added in CLion
         # example (can also separate with newlines):
         # src/AVL.h src/AVL.cpp
