@@ -10,7 +10,7 @@
 /*
  * Purpose: Load entire data from file
  */
-void BasicHashTable::load(std::string fileName) {
+void BasicHashTable::load(std::atomic<int>& progress, std::string fileName) {
     // Open file
     std::ifstream file;
     file.open(fileName);
@@ -23,7 +23,6 @@ void BasicHashTable::load(std::string fileName) {
     std::getline(file, line); // Ignore headers
     while (std::getline(file, line)) {
 
-        std::getline(file, line);
         std::stringstream ss(line);
         std::vector<std::string> row;
         std::string cell;
@@ -31,17 +30,28 @@ void BasicHashTable::load(std::string fileName) {
         while (std::getline(ss, cell, ',')) {
             row.push_back(cell);
         }
-        if (row[7].empty() || row[2].empty() || row[10].empty()) {
+        if (row.size() < 11) {
+            continue; // Skip malformed line
+        }
+        if (row[7].empty() || row[2].empty()) {
             continue;
+        } else if (row[10].empty()) {
+            row[10] = "0";
         }
         data[row[7]][row[2]].push_back(std::stof(row[10]));
+        progress++;
     }
+    progress = -1;
+    std::getline(file, line);
+    std::cout << line;
+
+    file.close();
 }
 
 /*
  * Purpose: Load specific number of dataset
  */
-void BasicHashTable::load(std::string fileName, int maxLoad) {
+void BasicHashTable::load(std::atomic<int>& progress, std::string fileName, int maxLoad) {
     // Open file
     std::ifstream file;
     file.open(fileName);
@@ -60,7 +70,6 @@ void BasicHashTable::load(std::string fileName, int maxLoad) {
             break;
         }
 
-        std::getline(file, line);
         std::stringstream ss(line);
         std::vector<std::string> row;
         std::string cell;
@@ -68,12 +77,16 @@ void BasicHashTable::load(std::string fileName, int maxLoad) {
         while (std::getline(ss, cell, ',')) {
             row.push_back(cell);
         }
-        if (row[7].empty() || row[2].empty() || row[10].empty()) {
+        if (row[7].empty() || row[2].empty()) {
             continue;
+        } else if (row[10].empty()) {
+            row[10] = "0";
         }
         data[row[7]][row[2]].push_back(std::stof(row[10]));
         count++;
+        progress++;
     }
+    progress = -1;
 }
 
 /*
