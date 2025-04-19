@@ -5,33 +5,31 @@
 #ifndef ORDEREDMAPTABLE_H
 #define ORDEREDMAPTABLE_H
 
+#include "HashTable.h"
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
-class OrderedMapTable {
+class OrderedMapTable : public HashTable {
 private:
-    // Map sorted by question and state
+    // question -> state -> vector<float>
     std::map<std::string, std::map<std::string, std::vector<float>>> data;
 
 public:
-    // Load entry into the ordered map
+    OrderedMapTable() = default;
+    ~OrderedMapTable() override = default;
+
+    // Insert single value (for internal use)
     void insert(std::string question, std::string state, float value);
 
-    // Load all data from CSV
-    void load(std::string fileName);
+    // Required overrides
+    void load(std::atomic<int>& progress, std::string fileName) override;
+    void load(std::atomic<int>& progress, std::string fileName, int maxLoad) override;
+    std::vector<float> search(std::string question, std::string state) override;
+    std::vector<std::string> searchStates(std::string question) override;
 
-    // Load limited number of rows from CSV
-    void load(std::string fileName, int maxLoad);
-
-    // Search by question and state
-    std::vector<float> search(std::string question, std::string state) ;
-
-    // Search all states for a given question
-    std::vector<std::string> searchStates(std::string question) ;
-
-    // optional debugging or GUI display
-    std::vector<std::string> getOrderedQuestions() ;
+    // Optional: for GUI/debugging
+    std::vector<std::string> getOrderedQuestions();
 };
 
 #endif // ORDEREDMAPTABLE_H

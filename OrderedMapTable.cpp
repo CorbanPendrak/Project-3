@@ -18,7 +18,7 @@ void OrderedMapTable::insert(std::string question, std::string state, float valu
 /*
  * Purpose: Load entire dataset from CSV
  */
-void OrderedMapTable::load(std::string fileName) {
+void OrderedMapTable::load(std::atomic<int>& progress, std::string fileName) {
     std::ifstream file(fileName);
     if (!file.is_open()) {
         std::cout << "Error opening file " << fileName << std::endl;
@@ -26,7 +26,8 @@ void OrderedMapTable::load(std::string fileName) {
     }
 
     std::string line;
-    std::getline(file, line); // skip header
+    std::getline(file, line); // skip headers
+    int count = 0;
 
     while (std::getline(file, line)) {
         std::stringstream ss(line);
@@ -37,21 +38,25 @@ void OrderedMapTable::load(std::string fileName) {
             row.push_back(cell);
         }
 
-        // Validate required fields
-        if (row.size() > 10 && !row[7].empty() && !row[2].empty() && !row[10].empty()) {
-            std::string question = row[7];
-            std::string state = row[2];
-            float value = std::stof(row[10]);
-
-            insert(question, state, value);
+        if (row.size() < 11 || row[7].empty() || row[2].empty() || row[10].empty()) {
+            continue;
         }
+
+        std::string question = row[7];
+        std::string state = row[2];
+        float value = std::stof(row[10]);
+
+        insert(question, state, value);
+        progress = ++count;
     }
+
+    progress = -1; // signal done
 }
 
 /*
  * Purpose: Load up to maxLoad entries from CSV
  */
-void OrderedMapTable::load(std::string fileName, int maxLoad) {
+void OrderedMapTable::load(std::atomic<int>& progress, std::string fileName, int maxLoad) {
     std::ifstream file(fileName);
     if (!file.is_open()) {
         std::cout << "Error opening file " << fileName << std::endl;
@@ -59,9 +64,9 @@ void OrderedMapTable::load(std::string fileName, int maxLoad) {
     }
 
     std::string line;
-    std::getline(file, line); // skip header
-
+    std::getline(file, line); // skip headers
     int count = 0;
+
     while (std::getline(file, line) && count < maxLoad) {
         std::stringstream ss(line);
         std::vector<std::string> row;
@@ -71,15 +76,19 @@ void OrderedMapTable::load(std::string fileName, int maxLoad) {
             row.push_back(cell);
         }
 
-        if (row.size() > 10 && !row[7].empty() && !row[2].empty() && !row[10].empty()) {
-            std::string question = row[7];
-            std::string state = row[2];
-            float value = std::stof(row[10]);
-
-            insert(question, state, value);
-            count++;
+        if (row.size() < 11 || row[7].empty() || row[2].empty() || row[10].empty()) {
+            continue;
         }
+
+        std::string question = row[7];
+        std::string state = row[2];
+        float value = std::stof(row[10]);
+
+        insert(question, state, value);
+        progress = ++count;
     }
+
+    progress = -1; // signal done
 }
 
 /*
@@ -103,7 +112,7 @@ std::vector<std::string> OrderedMapTable::searchStates(std::string question)  {
     std::vector<std::string> result;
     auto It = data.find(question);
     if (It != data.end()) {
-        for (const auto& statePair : It->second) {
+        for (auto& statePair : It->second) {
             result.push_back(statePair.first);
         }
     }
@@ -115,7 +124,7 @@ std::vector<std::string> OrderedMapTable::searchStates(std::string question)  {
  */
 std::vector<std::string> OrderedMapTable::getOrderedQuestions()  {
     std::vector<std::string> result;
-    for (const auto& q : data) {
+    for (auto& q : data) {
         result.push_back(q.first);
     }
     return result;
