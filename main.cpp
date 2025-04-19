@@ -11,7 +11,7 @@ std::string verifyOption(std::string name, const std::vector<std::string> &optio
     std::cout << "  " << name << std::endl
                  << "-------------\n";
 
-    for (unsigned int i = 0; i < (options.size() ) / cols; i++) {
+    for (int i = 0; i < static_cast<int>(options.size() / cols); i++) {
         std::cout << i+1 << ". " << options[i];
         for (int j = 1; j < cols; j++) {
             if (i + ((options.size() + 1) / (j + 1)) >= options.size()) {
@@ -72,9 +72,10 @@ void printDataAnalysis(std::vector<float> data) {
         sum += elem;
     }
 
-    std::cout << "\t\tMinimum value: " << std::fixed << std::setprecision(2) << min
+    std::cout
+        << "\t\tAverage: " << std::fixed << std::setprecision(2) << sum / data.size()
+        << "\n\t\tMinimum value: " << std::fixed << std::setprecision(2) << min
         << "\n\t\tMaximum value: " << std::fixed << std::setprecision(2) << max
-        << "\n\t\tAverage: " << std::fixed << std::setprecision(2) << sum / data.size()
         << "\n\t\tSample size: " << std::fixed << std::setprecision(2) << data.size() << std::endl;
 }
 
@@ -92,22 +93,15 @@ int main() {
 
     HashTable* hashtable;
     if (hashTableChoice == "Basic Hash Table") {
-        BasicHashTable basicHashTable;
-        hashtable = &basicHashTable;
+        hashtable = new BasicHashTable();
     } else {
-        BasicHashTable basicHashTable;
-        hashtable = &basicHashTable;
+        hashtable = new BasicHashTable();
     }
 
     // Load data
     sf::RenderWindow window(sf::VideoMode(sf::Vector2u(170, 70)), "SFML Test Application");
-    std::cout << window.setActive(false);
-    //std::thread thread(&renderingThread, &window, &hashtable);
     std::atomic<int> progress(0);
     std::thread worker([&]() {hashtable->load(progress, fileName);});
-
-    // activate the window's context
-    std::cout << window.setActive(true);
 
     // the rendering loop
     hashtable->progressBar->setSize(150, 50);
@@ -183,7 +177,7 @@ int main() {
 
     std::cout << "Goodbye!" << std::endl;
 
-     return 0;
+    return 0;
 }
 
 
