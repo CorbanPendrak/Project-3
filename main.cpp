@@ -11,7 +11,7 @@ std::string verifyOption(std::string name, const std::vector<std::string> &optio
     std::cout << "  " << name << std::endl
                  << "-------------\n";
 
-    for (unsigned int i = 0; i < (options.size() ) / cols; i++) {
+    for (int i = 0; i < (options.size() ) / cols; i++) {
         std::cout << i+1 << ". " << options[i];
         for (int j = 1; j < cols; j++) {
             if (i + ((options.size() + 1) / (j + 1)) >= options.size()) {
