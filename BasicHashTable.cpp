@@ -30,6 +30,9 @@ void BasicHashTable::load(std::atomic<int>& progress, std::string fileName) {
         while (std::getline(ss, cell, ',')) {
             row.push_back(cell);
         }
+        if (row.size() < 11) {
+            continue; // Skip malformed line
+        }
         if (row[7].empty() || row[2].empty()) {
             continue;
         } else if (row[10].empty()) {

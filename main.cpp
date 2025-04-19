@@ -126,9 +126,9 @@ int main() {
         window.display();
     }
 
-    /*if (worker.joinable()) {
+    if (worker.joinable()) {
         worker.join();
-    }*/
+    }
 
     // Query
     while (true) {
@@ -176,6 +176,8 @@ int main() {
     }
 
     std::cout << "Goodbye!" << std::endl;
+
+    delete hashtable;
 
     return 0;
 }
