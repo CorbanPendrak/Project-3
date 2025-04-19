@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.29.6)
 project(Project_3)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -39,6 +39,8 @@ add_executable(Project_3
         BasicHashTable.cpp
         BasicHashTable.h
         HashTable.h
+        LinearProbingHashTable.cpp
+        LinearProbingHashTable.h
         # add your own header files below - should be automatically added in CLion
         # example (can also separate with newlines):
         # src/AVL.h src/AVL.cpp
