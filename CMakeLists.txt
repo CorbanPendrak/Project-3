@@ -38,6 +38,10 @@ add_executable(Project_3
         ProgressBar.h
         BasicHashTable.cpp
         BasicHashTable.h
+        LinearProbingHashTable.h
+        LinearProbingHashTable.cpp
+        OrderedMapTable.h
+        OrderedMapTable.cpp
         HashTable.h
         CLI.cpp
         # add your own header files below - should be automatically added in CLion

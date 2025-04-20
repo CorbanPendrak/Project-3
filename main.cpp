@@ -1,20 +1,35 @@
 #include <iostream>
-#include <SFML/Graphics.hpp>
-#include "BasicHashTable.h"
 #include <string>
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
 #include <thread>
 
+#include <SFML/Graphics.hpp>
+
+#include "BasicHashTable.h"
+#include "LinearProbingHashTable.h"
+#include "OrderedMapTable.h"
+
 int chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
-    window = sf::RenderWindow(sf::VideoMode(sf::Vector2u(280, 120)), "Choose Hash Table");
+    window = sf::RenderWindow(sf::VideoMode(sf::Vector2u(320, 120)), "Choose Hash Table");
     sf::Font font("MonaspaceXenon-Regular.otf");
 
     // Basic Hash Table
     sf::Text basicHashTable(font, "Basic Hash Table", 24);
     basicHashTable.setFillColor(sf::Color::Green);
     basicHashTable.setPosition(sf::Vector2f(20, 20));
+
+    // Linear Probing Hash Table
+    sf::Text linearProbingHashTable(font, "Linear Probing Hash Table", 24);
+    linearProbingHashTable.setFillColor(sf::Color::Green);
+    linearProbingHashTable.setPosition(sf::Vector2f(20, 50));
+
+    // Ordered Map Table
+    sf::Text orderedMapTable(font, "Ordered Map Table", 24);
+    orderedMapTable.setFillColor(sf::Color::Green);
+    orderedMapTable.setPosition(sf::Vector2f(20, 80));
+
     sf::Clock timer;
 
     while (window.isOpen()) {
@@ -28,12 +43,20 @@ int chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
                 if (basicHashTable.getGlobalBounds().contains(sf::Vector2f(mousePosition))) {
                     hashtable = new BasicHashTable();
                     window.close();
+                } else if (linearProbingHashTable.getGlobalBounds().contains(sf::Vector2f(mousePosition))) {
+                    hashtable = new LinearProbingHashTable();
+                    window.close();
+                } else if (orderedMapTable.getGlobalBounds().contains(sf::Vector2f(mousePosition))) {
+                    hashtable = new OrderedMapTable();
+                    window.close();
                 }
             }
         }
 
         window.clear();
         window.draw(basicHashTable);
+        window.draw(linearProbingHashTable);
+        window.draw(orderedMapTable);
         window.display();
     }
     std::cout << "It took you " << std::fixed << std::setprecision(5) << timer.getElapsedTime().asSeconds() << " seconds to decide on a hash table.\n";
@@ -61,6 +84,7 @@ int loadDataset(HashTable*& hashtable, sf::RenderWindow& window) {
         bool loadedDataset = false;
         hashtable->progressBar->setSize(150, 50);
         hashtable->progressBar->setPosition(40, 60);
+        hashtable->progressBar->setColor(sf::Color::White, sf::Color::Transparent);
 
         // the rendering loop
         while (window.isOpen())
@@ -155,6 +179,7 @@ int main() {
     }
     bool questionsVisible = true;
     std::string chosenQuestion = "";
+    std::string chosenQuestionNice = "";
 
     // Display States
     std::vector<std::string> states;
@@ -190,6 +215,7 @@ int main() {
                         if (questionTexts[i].getGlobalBounds().contains(sf::Vector2<float>(localPosition))) {
                             questionsVisible = false;
                             chosenQuestion = questions[i].second;
+                            chosenQuestionNice = questions[i].first;
 
                             // Display states
                             timer.restart();
@@ -234,7 +260,7 @@ int main() {
                                 sum += elem;
                             }
 
-                            sf::Text question(font, chosenQuestion, 16);
+                            sf::Text question(font, chosenQuestionNice, 16);
                             question.setPosition(sf::Vector2(20.f, 20.f));
                             results.push_back(question);
 
