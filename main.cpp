@@ -7,7 +7,7 @@
 #include <iomanip>
 #include <thread>
 
-void chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
+int chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
     window = sf::RenderWindow(sf::VideoMode(sf::Vector2u(280, 120)), "Choose Hash Table");
     sf::Font font("MonaspaceXenon-Regular.otf");
 
@@ -15,12 +15,13 @@ void chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
     sf::Text basicHashTable(font, "Basic Hash Table", 24);
     basicHashTable.setFillColor(sf::Color::Green);
     basicHashTable.setPosition(sf::Vector2f(20, 20));
+    sf::Clock timer;
 
     while (window.isOpen()) {
         while (const std::optional event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 window.close();
-                return;
+                return 1;
             }
             if (isButtonPressed(sf::Mouse::Button::Left)) {
                 sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
@@ -35,14 +36,17 @@ void chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
         window.draw(basicHashTable);
         window.display();
     }
+    std::cout << "It took you " << std::fixed << std::setprecision(5) << timer.getElapsedTime().asSeconds() << " seconds to decide on a hash table.\n";
+    return 0;
 }
 
-void loadDataset(HashTable*& hashtable, sf::RenderWindow& window) {
+int loadDataset(HashTable*& hashtable, sf::RenderWindow& window) {
         std::string fileName = "Nutrition__Physical_Activity__and_Obesity_-_Behavioral_Risk_Factor_Surveillance_System.csv";
         // Load Dataset
         window = sf::RenderWindow(sf::VideoMode(sf::Vector2u(230, 120)), "Load dataset");
 
         sf::Font font("MonaspaceXenon-Regular.otf");
+        sf::Clock timer;
 
         // Buttons
         sf::Text loadButton(font, "Load Database", 24);
@@ -64,12 +68,14 @@ void loadDataset(HashTable*& hashtable, sf::RenderWindow& window) {
             while (const std::optional event = window.pollEvent()) {
                 if (event->is<sf::Event::Closed>()) {
                     window.close();
+                    return 1;
                 }
                 if (isButtonPressed(sf::Mouse::Button::Left)) {
                     /// get the local mouse position (relative to a window)
                     sf::Vector2i localPosition = sf::Mouse::getPosition(window);
                     if (!loadedDataset && loadButton.getGlobalBounds().contains(sf::Vector2f(localPosition))) {
                         // Run load function
+                        timer.restart();
                         std::thread worker([&]() {hashtable->load(progress, fileName);});
                         worker.detach();
                         loadedDataset = true;
@@ -89,7 +95,9 @@ void loadDataset(HashTable*& hashtable, sf::RenderWindow& window) {
             if (displayProgress) {
                 int currentProgress = progress.load();
                 if (currentProgress == -1) {
+                    std::cout << "Loaded dataset in " << std::fixed << std::setprecision(5) << timer.getElapsedTime().asSeconds() << " seconds.\n";
                     loadedClock.start();
+                    progress = 104273;
                 } else {
                     hashtable->progressBar->clear();
                     hashtable->progressBar->add(currentProgress);
@@ -101,6 +109,7 @@ void loadDataset(HashTable*& hashtable, sf::RenderWindow& window) {
 
             window.display();
         }
+    return 0;
 }
 
 int main() {
@@ -111,8 +120,12 @@ int main() {
     HashTable* hashtable = nullptr;
     sf::RenderWindow window;
     if (devMode) {
-        chooseHashTable(hashtable, window);
-        loadDataset(hashtable, window);
+        if (chooseHashTable(hashtable, window) != 0) {
+            return 1;
+        }
+        if (loadDataset(hashtable, window) != 0) {
+            return 1;
+        };
     } else {
         hashtable = new BasicHashTable();
         std::atomic<int> progress(0);
@@ -158,6 +171,9 @@ int main() {
     restart.setFillColor(sf::Color::Green);
     restart.setPosition(sf::Vector2(20.f, 160.f));
 
+    // Timer
+    sf::Clock timer;
+
     window = sf::RenderWindow(sf::VideoMode(sf::Vector2u(700, 240)), "General Nutritional Biases");
 
     // the rendering loop
@@ -165,7 +181,6 @@ int main() {
         while (const std::optional event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 window.close();
-                return 0;
             }
             if (isButtonPressed(sf::Mouse::Button::Left)) {
                 /// get the local mouse position (relative to a window)
@@ -177,6 +192,7 @@ int main() {
                             chosenQuestion = questions[i].second;
 
                             // Display states
+                            timer.restart();
                             states.clear();
                             stateTexts.clear();
                             statesVisible = true;
@@ -188,6 +204,7 @@ int main() {
                                 state.setFillColor(sf::Color::Green);
                                 stateTexts.push_back(state);
                             }
+                            std::cout << "Found states in " << std::fixed << std::setprecision(5) << timer.getElapsedTime().asSeconds() << " seconds.\n";
                         }
                     }
                 } else if (statesVisible) {
@@ -197,6 +214,7 @@ int main() {
                             chosenState = states[i];
 
                             // Display results
+                            timer.restart();
                             results.clear();
                             resultsVisible = true;
                             std::vector<float> data = hashtable->search(chosenQuestion, chosenState);
@@ -247,6 +265,8 @@ int main() {
                             sf::Text sampleSize(font, ss.str(), 16);
                             sampleSize.setPosition(sf::Vector2(20.f, 140.f));
                             results.push_back(sampleSize);
+
+                            std::cout << "Found results in " << std::fixed << std::setprecision(5) << timer.getElapsedTime().asSeconds() << " seconds.\n";
                         }
                     }
                 } else if (resultsVisible) {
@@ -340,6 +360,5 @@ int main() {
 }
 
 
-// Todo: add timing
 // Todo: add tests
 // Todo: add other hashtables
