@@ -1,13 +1,18 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include "OrderedMapTable.h"
 #include "BasicHashTable.h"
 #include "LinearProbingHashTable.h"
+#include "DropDown.h"
 #include <chrono>
 #include <string>
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
 #include <thread>
+#include <numeric>
+#include <sstream>
+
 
 std::string verifyOption(std::string name, const std::vector<std::string> &options, int cols = 1) {
     std::cout << "  " << name << std::endl
@@ -81,16 +86,17 @@ void printDataAnalysis(std::vector<float> data) {
         << "\n\t\tSample size: " << std::fixed << std::setprecision(2) << data.size() << std::endl;
 }
 
+
 int main() {
     std::string fileName = "Nutrition__Physical_Activity__and_Obesity_-_Behavioral_Risk_Factor_Surveillance_System.csv";
     std::cout << "*-------------------------------------------------------------------------*\n"
                  "| U.S. Department of Health & Human Services Nutritional Dataset Analysis |\n"
                  "*-------------------------------------------------------------------------*\n\n";
 
-    // Load data
     std::vector<std::string> hashTables = {
         "Basic Hash Table",
-        "Linear Probing Hash Table"
+        "Linear Probing Hash Table",
+        "Ordered Map Table"
     };
 
     std::string hashTableChoice = verifyOption("Hash Table", hashTables);
@@ -100,30 +106,29 @@ int main() {
         hashtable = new BasicHashTable();
     } else if (hashTableChoice == "Linear Probing Hash Table") {
         hashtable = new LinearProbingHashTable();
+    } else if (hashTableChoice == "Ordered Map Table") {
+        hashtable = new OrderedMapTable();
     } else {
         std::cout << "Invalid choice.\n";
         return 1;
     }
 
-
-    // Load data
-    sf::RenderWindow window(sf::VideoMode(sf::Vector2u(170, 70)), "SFML Test Application");
+    // Setup progress bar
+    sf::RenderWindow window(sf::VideoMode(sf::Vector2u(170, 70)), "SFML Progress Bar");
     std::atomic<int> progress(0);
-    double loadTime = 0.0;
 
-    std::thread worker([&]() {
-        auto start = std::chrono::high_resolution_clock::now();
-        hashtable->load(progress, fileName);
-        auto end = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> elapsed = end - start;
-        loadTime = elapsed.count();
-    });
-
-    // progress bar settings
     hashtable->progressBar->setSize(150, 50);
     hashtable->progressBar->setPosition(10, 10);
 
-    // SFML render loop
+    // Start timing
+    auto start = std::chrono::high_resolution_clock::now();
+
+    // Start loading thread
+    std::thread worker([&]() {
+        hashtable->load(progress, fileName);
+    });
+
+    // Progress bar loop
     while (window.isOpen()) {
         while (const std::optional event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
@@ -143,42 +148,19 @@ int main() {
         window.display();
     }
 
-    // wait for thread to finish
+    // Wait for loading to finish
     if (worker.joinable()) {
         worker.join();
     }
 
+    // Stop timing
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    double loadTime = elapsed.count();
     std::cout << "Load time: " << loadTime << " seconds\n";
 
+    // Query loop
 
-    // the rendering loop
-    hashtable->progressBar->setSize(150, 50);
-    hashtable->progressBar->setPosition(10, 10);
-    while (window.isOpen())
-    {
-        while (const std::optional event = window.pollEvent()) {
-            if (event->is<sf::Event::Closed>()) {
-                window.close();
-            }
-        }
-
-        int currentProgress = progress.load();
-        if (currentProgress == -1) {
-            window.close();
-        }
-
-        window.clear();
-        hashtable->progressBar->clear();
-        hashtable->progressBar->add(currentProgress);
-        window.draw(*hashtable->progressBar);
-        window.display();
-    }
-
-    if (worker.joinable()) {
-        worker.join();
-    }
-
-    // Query
     while (true) {
         std::vector<std::string> questions = {
             "Percent of adults who engage in no leisure-time physical activity",
@@ -190,46 +172,39 @@ int main() {
             "Percent of adults aged 18 years and older who have obesity",
             "Percent of adults who report consuming fruit less than one time daily",
             "Percent of adults who report consuming vegetables less than one time daily",
-            };
+        };
 
         std::string question = verifyOption("Question", questions);
-        if (question.empty()) {
-            break;
-        }
+        if (question.empty()) break;
 
         std::vector<std::string> states = hashtable->searchStates(question);
         std::sort(states.begin(), states.end());
-        std::string state = verifyOption("State", states, 2);
-        if (state.empty()) {
-            continue;
-        }
-        std::vector<float> result = hashtable->search(question, state);
 
-        // Print result
+        // Clarify the state entries for the user
+        std::cout << "\nNote: The following list includes U.S. states, territories, and a national summary:\n";
+        std::cout << " - 'GU' = Guam\n"
+                     " - 'PR' = Puerto Rico\n"
+                     " - 'VI' = U.S. Virgin Islands\n"
+                     " - 'DC' = District of Columbia\n"
+                     " - 'US' = National aggregate (all states combined)\n";
+        std::cout << "Please select from the numbered list below:\n";
+
+        std::string state = verifyOption("State", states, 2);
+        if (state.empty()) continue;
+
+
+        std::vector<float> result = hashtable->search(question, state);
         std::cout << question << "\n\t" << state << "\n";
-        /*
-        for (int i = 0; i < result.size(); i++) {
-            if (i == 0) {
-                std::cout << std::fixed << std::setprecision(2) << result[i];
-            } else if (i % 20 == 0) {
-                std::cout << ",\n\t\t " << std::fixed << std::setprecision(2) <<  result[i];
-            } else {
-                std::cout << ", " << std::fixed << std::setprecision(2) << result[i];
-            }
-        }
-        std::cout << ">" << "\n";
-        */
         printDataAnalysis(result);
         std::cout << std::endl;
     }
 
     std::cout << "Goodbye!" << std::endl;
-
     delete hashtable;
-
     return 0;
 }
 
 
-// Todo: add timing
-// Todo: add tests
+
+
+
