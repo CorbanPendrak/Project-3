@@ -6,110 +6,117 @@
 #include <fstream>
 #include <iomanip>
 #include <thread>
-#include <utility>
 
-
-void rintDataAnalysis(std::vector<float> data) {
-    if (data.size() == 0) {
-        std::cout << "There is no data for this query.\n";
-        return;
-    }
-
-    float min = data[0];
-    float max = data[0];
-    float sum = 0;
-    for (auto elem : data) {
-        if (elem < min)
-            min = elem;
-        if (elem > max)
-            max = elem;
-        sum += elem;
-    }
-
-    std::cout
-        << "\t\tAverage: " << std::fixed << std::setprecision(2) << sum / data.size()
-        << "\n\t\tMinimum value: " << std::fixed << std::setprecision(2) << min
-        << "\n\t\tMaximum value: " << std::fixed << std::setprecision(2) << max
-        << "\n\t\tSample size: " << std::fixed << std::setprecision(2) << data.size() << std::endl;
-}
-
-int main() {
-    std::string fileName = "Nutrition__Physical_Activity__and_Obesity_-_Behavioral_Risk_Factor_Surveillance_System.csv";
-
-    sf::RenderWindow window(sf::VideoMode(sf::Vector2u(230, 120)), "Load dataset");
-
-    // Buttons
+void chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
+    window = sf::RenderWindow(sf::VideoMode(sf::Vector2u(280, 120)), "Choose Hash Table");
     sf::Font font("MonaspaceXenon-Regular.otf");
-    sf::Font importantFont("MonaspaceXenon-ExtraBoldItalic.otf");
 
-    sf::Text loadButton(font, "Load Database", 24);
-    loadButton.setFillColor(sf::Color::Green);
-    loadButton.setPosition(sf::Vector2f(20, 20));
-    sf::Clock loadedClock;
-    loadedClock.stop();
-    bool displayProgress = true;
+    // Basic Hash Table
+    sf::Text basicHashTable(font, "Basic Hash Table", 24);
+    basicHashTable.setFillColor(sf::Color::Green);
+    basicHashTable.setPosition(sf::Vector2f(20, 20));
 
-    // Choose hash table
-    std::vector<std::string> hashTables = {
-        "Basic Hash Table",
-    };
-    std::string hashTableChoice = "Basic Hash Table"; //verifyOption("Hash Table", hashTables);
-
-    HashTable* hashtable;
-    if (hashTableChoice == "Basic Hash Table") {
-        hashtable = new BasicHashTable();
-    } else {
-        hashtable = new BasicHashTable();
-    }
-
-    // Progress bar
-    std::atomic<int> progress(0);
-    bool loadedDataset = false;
-    hashtable->progressBar->setSize(150, 50);
-    hashtable->progressBar->setPosition(40, 60);
-
-    // the rendering loop
-    while (window.isOpen())
-    {
+    while (window.isOpen()) {
         while (const std::optional event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 window.close();
+                return;
             }
             if (isButtonPressed(sf::Mouse::Button::Left)) {
-                /// get the local mouse position (relative to a window)
-                sf::Vector2i localPosition = sf::Mouse::getPosition(window);
-                if (!loadedDataset && loadButton.getGlobalBounds().contains(sf::Vector2<float>(localPosition))) {
-                    // Run load function
-                    std::thread worker([&]() {hashtable->load(progress, fileName);});
-                    worker.detach();
-                    loadedDataset = true;
-                    loadButton.setFillColor(sf::Color::White);
+                sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+                if (basicHashTable.getGlobalBounds().contains(sf::Vector2f(mousePosition))) {
+                    hashtable = new BasicHashTable();
+                    window.close();
                 }
             }
         }
 
         window.clear();
-
-        // Display progress bar
-        if (loadedClock.getElapsedTime().asSeconds() >= 1) {
-            displayProgress = false;
-            loadedClock.stop();
-            window.close();
-        }
-        if (displayProgress) {
-            int currentProgress = progress.load();
-            if (currentProgress == -1) {
-                loadedClock.start();
-            } else {
-                hashtable->progressBar->clear();
-                hashtable->progressBar->add(currentProgress);
-            }
-            window.draw(*hashtable->progressBar);
-        }
-
-        window.draw(loadButton);
-
+        window.draw(basicHashTable);
         window.display();
+    }
+}
+
+void loadDataset(HashTable*& hashtable, sf::RenderWindow& window) {
+        std::string fileName = "Nutrition__Physical_Activity__and_Obesity_-_Behavioral_Risk_Factor_Surveillance_System.csv";
+        // Load Dataset
+        window = sf::RenderWindow(sf::VideoMode(sf::Vector2u(230, 120)), "Load dataset");
+
+        sf::Font font("MonaspaceXenon-Regular.otf");
+
+        // Buttons
+        sf::Text loadButton(font, "Load Database", 24);
+        loadButton.setFillColor(sf::Color::Green);
+        loadButton.setPosition(sf::Vector2f(20, 20));
+        sf::Clock loadedClock;
+        loadedClock.stop();
+        bool displayProgress = true;
+
+        // Progress bar
+        std::atomic<int> progress(0);
+        bool loadedDataset = false;
+        hashtable->progressBar->setSize(150, 50);
+        hashtable->progressBar->setPosition(40, 60);
+
+        // the rendering loop
+        while (window.isOpen())
+        {
+            while (const std::optional event = window.pollEvent()) {
+                if (event->is<sf::Event::Closed>()) {
+                    window.close();
+                }
+                if (isButtonPressed(sf::Mouse::Button::Left)) {
+                    /// get the local mouse position (relative to a window)
+                    sf::Vector2i localPosition = sf::Mouse::getPosition(window);
+                    if (!loadedDataset && loadButton.getGlobalBounds().contains(sf::Vector2f(localPosition))) {
+                        // Run load function
+                        std::thread worker([&]() {hashtable->load(progress, fileName);});
+                        worker.detach();
+                        loadedDataset = true;
+                        loadButton.setFillColor(sf::Color::White);
+                    }
+                }
+            }
+
+            window.clear();
+
+            // Display progress bar
+            if (loadedClock.getElapsedTime().asSeconds() >= 1) {
+                displayProgress = false;
+                loadedClock.stop();
+                window.close();
+            }
+            if (displayProgress) {
+                int currentProgress = progress.load();
+                if (currentProgress == -1) {
+                    loadedClock.start();
+                } else {
+                    hashtable->progressBar->clear();
+                    hashtable->progressBar->add(currentProgress);
+                }
+                window.draw(*hashtable->progressBar);
+            }
+
+            window.draw(loadButton);
+
+            window.display();
+        }
+}
+
+int main() {
+    std::string fileName = "Nutrition__Physical_Activity__and_Obesity_-_Behavioral_Risk_Factor_Surveillance_System.csv";
+    bool devMode = true;
+    sf::Font font("MonaspaceXenon-Regular.otf");
+
+    HashTable* hashtable = nullptr;
+    sf::RenderWindow window;
+    if (devMode) {
+        chooseHashTable(hashtable, window);
+        loadDataset(hashtable, window);
+    } else {
+        hashtable = new BasicHashTable();
+        std::atomic<int> progress(0);
+        hashtable->load(progress, fileName);
     }
 
     // Display questions
@@ -125,13 +132,13 @@ int main() {
         {"% adults eat vegetables < 1/day", "Percent of adults who report consuming vegetables less than one time daily"},
         };
     std::vector<sf::Text> questionTexts;
-    float i = 0;
+    float j = 0;
     for (const auto& questionPair : questions) {
         sf::Text question(font, questionPair.first, 16);
-        question.setPosition(sf::Vector2f(20.f, 20.f + (22.f * i)));
+        question.setPosition(sf::Vector2f(20.f, 20.f + (22.f * j)));
         question.setFillColor(sf::Color::Green);
         questionTexts.push_back(question);
-        i++;
+        j++;
     }
     bool questionsVisible = true;
     std::string chosenQuestion = "";
@@ -149,7 +156,7 @@ int main() {
     // Restart query
     sf::Text restart(font, "Search again", 16);
     restart.setFillColor(sf::Color::Green);
-    restart.setPosition(sf::Vector2(20.f, 140.f));
+    restart.setPosition(sf::Vector2(20.f, 160.f));
 
     window = sf::RenderWindow(sf::VideoMode(sf::Vector2u(700, 240)), "General Nutritional Biases");
 
@@ -177,7 +184,7 @@ int main() {
                             std::sort(states.begin(), states.end());
                             for (int i = 0; i < states.size(); i++) {
                                 sf::Text state(font, states[i], 16);
-                                state.setPosition(sf::Vector2f(120.f + (50.f * static_cast<float>(i % 10)), 20.f + (35.f * static_cast<float>(i / 10))));
+                                state.setPosition(sf::Vector2f(20.f + (50.f * static_cast<float>(i % 10)), 20.f + (35.f * static_cast<float>(i / 10))));
                                 state.setFillColor(sf::Color::Green);
                                 stateTexts.push_back(state);
                             }
@@ -209,28 +216,36 @@ int main() {
                                 sum += elem;
                             }
 
+                            sf::Text question(font, chosenQuestion, 16);
+                            question.setPosition(sf::Vector2(20.f, 20.f));
+                            results.push_back(question);
+
+                            sf::Text state(font, chosenState, 16);
+                            state.setPosition(sf::Vector2(20.f, 40.f));
+                            results.push_back(state);
+
                             std::stringstream ss;
                             ss << "Average: " << std::fixed << std::setprecision(2) << sum / data.size();
                             sf::Text average(font, ss.str(), 16);
-                            average.setPosition(sf::Vector2(20.f, 20.f));
+                            average.setPosition(sf::Vector2(20.f, 80.f));
                             results.push_back(average);
 
                             ss = std::stringstream();
                             ss << "Minimum value: " << std::fixed << std::setprecision(2) << min;
                             sf::Text minimum(font, ss.str(), 16);
-                            minimum.setPosition(sf::Vector2(20.f, 50.f));
+                            minimum.setPosition(sf::Vector2(20.f, 100.f));
                             results.push_back(minimum);
 
                             ss = std::stringstream();
                             ss << "Maximum value: " << std::fixed << std::setprecision(2) << max;
                             sf::Text maximum(font, ss.str(), 16);
-                            maximum.setPosition(sf::Vector2(20.f, 80.f));
+                            maximum.setPosition(sf::Vector2(20.f, 120.f));
                             results.push_back(maximum);
 
                             ss = std::stringstream();
                             ss << "Sample size: " << std::fixed << std::setprecision(2) << data.size();
                             sf::Text sampleSize(font, ss.str(), 16);
-                            sampleSize.setPosition(sf::Vector2(20.f, 110.f));
+                            sampleSize.setPosition(sf::Vector2(20.f, 140.f));
                             results.push_back(sampleSize);
                         }
                     }
@@ -239,7 +254,6 @@ int main() {
                         // Display questions
                         resultsVisible = false;
                         questionsVisible = true;
-                        std::cout << "restarting\n";
                     }
                 }
             }
