@@ -3,15 +3,13 @@
 #include "OrderedMapTable.h"
 #include "BasicHashTable.h"
 #include "LinearProbingHashTable.h"
-#include "DropDown.h"
 #include <chrono>
 #include <string>
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
 #include <thread>
-#include <numeric>
-#include <sstream>
+
 
 
 std::string verifyOption(std::string name, const std::vector<std::string> &options, int cols = 1) {
