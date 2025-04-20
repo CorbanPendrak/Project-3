@@ -39,6 +39,7 @@ add_executable(Project_3
         BasicHashTable.cpp
         BasicHashTable.h
         HashTable.h
+        CLI.cpp
         # add your own header files below - should be automatically added in CLion
         # example (can also separate with newlines):
         # src/AVL.h src/AVL.cpp

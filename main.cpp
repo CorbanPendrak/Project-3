@@ -6,56 +6,10 @@
 #include <fstream>
 #include <iomanip>
 #include <thread>
+#include <utility>
 
-std::string verifyOption(std::string name, const std::vector<std::string> &options, int cols = 1) {
-    std::cout << "  " << name << std::endl
-                 << "-------------\n";
 
-    for (int i = 0; i < static_cast<int>(options.size() / cols); i++) {
-        std::cout << i+1 << ". " << options[i];
-        for (int j = 1; j < cols; j++) {
-            if (i + ((options.size() + 1) / (j + 1)) >= options.size()) {
-                break;
-            }
-            std::cout << "\t" << i + ((options.size() + 1) / (j+1)) + 1 << ". " << options[i + ((options.size() + 1) / (j+1))] << "\t";
-        }
-        std::cout << std::endl;
-    }
-    if (cols > 1) {
-        for (int i = 1; i < cols; i++) {
-            std::cout << (options.size() + 1) / cols << ". " << options[(options.size() + 1) / cols - 1];
-        }
-        std::cout << std::endl;
-    }
-    std::cout << options.size() + 1 << ". Exit\n";
-
-    std::cout << std::endl;
-    std::string option = "";
-    while (true) {
-        std::cout << name << ": ";
-        long unsigned int optionNumber;
-        if (!(std::cin >> optionNumber)) {
-            std::cin.clear();
-            std::cin.ignore();
-        };
-
-        // Starting at 1 with extra exit option
-        if (optionNumber > 0 && optionNumber < options.size() + 2) {
-            if (optionNumber == options.size() + 1) {
-                // Break out of main loop
-                return "";
-            }
-            option = options[optionNumber-1];
-            break;
-        }
-        std::cout << "That is an invalid option, please choose 1-" << options.size() + 1 << "." << std::endl;
-    }
-    std::cout << std::endl;
-
-    return option;
-}
-
-void printDataAnalysis(std::vector<float> data) {
+void rintDataAnalysis(std::vector<float> data) {
     if (data.size() == 0) {
         std::cout << "There is no data for this query.\n";
         return;
@@ -81,15 +35,25 @@ void printDataAnalysis(std::vector<float> data) {
 
 int main() {
     std::string fileName = "Nutrition__Physical_Activity__and_Obesity_-_Behavioral_Risk_Factor_Surveillance_System.csv";
-    std::cout << "*-------------------------------------------------------------------------*\n"
-                 "| U.S. Department of Health & Human Services Nutritional Dataset Analysis |\n"
-                 "*-------------------------------------------------------------------------*\n\n";
 
-    // Load data
+    sf::RenderWindow window(sf::VideoMode(sf::Vector2u(230, 120)), "Load dataset");
+
+    // Buttons
+    sf::Font font("MonaspaceXenon-Regular.otf");
+    sf::Font importantFont("MonaspaceXenon-ExtraBoldItalic.otf");
+
+    sf::Text loadButton(font, "Load Database", 24);
+    loadButton.setFillColor(sf::Color::Green);
+    loadButton.setPosition(sf::Vector2f(20, 20));
+    sf::Clock loadedClock;
+    loadedClock.stop();
+    bool displayProgress = true;
+
+    // Choose hash table
     std::vector<std::string> hashTables = {
         "Basic Hash Table",
     };
-    std::string hashTableChoice = verifyOption("Hash Table", hashTables);
+    std::string hashTableChoice = "Basic Hash Table"; //verifyOption("Hash Table", hashTables);
 
     HashTable* hashtable;
     if (hashTableChoice == "Basic Hash Table") {
@@ -98,39 +62,215 @@ int main() {
         hashtable = new BasicHashTable();
     }
 
-    // Load data
-    sf::RenderWindow window(sf::VideoMode(sf::Vector2u(170, 70)), "SFML Test Application");
+    // Progress bar
     std::atomic<int> progress(0);
-    std::thread worker([&]() {hashtable->load(progress, fileName);});
+    bool loadedDataset = false;
+    hashtable->progressBar->setSize(150, 50);
+    hashtable->progressBar->setPosition(40, 60);
 
     // the rendering loop
-    hashtable->progressBar->setSize(150, 50);
-    hashtable->progressBar->setPosition(10, 10);
     while (window.isOpen())
     {
         while (const std::optional event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 window.close();
             }
-        }
-
-        int currentProgress = progress.load();
-        if (currentProgress == -1) {
-            window.close();
+            if (isButtonPressed(sf::Mouse::Button::Left)) {
+                /// get the local mouse position (relative to a window)
+                sf::Vector2i localPosition = sf::Mouse::getPosition(window);
+                if (!loadedDataset && loadButton.getGlobalBounds().contains(sf::Vector2<float>(localPosition))) {
+                    // Run load function
+                    std::thread worker([&]() {hashtable->load(progress, fileName);});
+                    worker.detach();
+                    loadedDataset = true;
+                    loadButton.setFillColor(sf::Color::White);
+                }
+            }
         }
 
         window.clear();
-        hashtable->progressBar->clear();
-        hashtable->progressBar->add(currentProgress);
-        window.draw(*hashtable->progressBar);
+
+        // Display progress bar
+        if (loadedClock.getElapsedTime().asSeconds() >= 1) {
+            displayProgress = false;
+            loadedClock.stop();
+            window.close();
+        }
+        if (displayProgress) {
+            int currentProgress = progress.load();
+            if (currentProgress == -1) {
+                loadedClock.start();
+            } else {
+                hashtable->progressBar->clear();
+                hashtable->progressBar->add(currentProgress);
+            }
+            window.draw(*hashtable->progressBar);
+        }
+
+        window.draw(loadButton);
+
         window.display();
     }
 
-    if (worker.joinable()) {
-        worker.join();
+    // Display questions
+    std::vector<std::pair<std::string, std::string>> questions = {
+        {"% adults with no fun physical activity", "Percent of adults who engage in no leisure-time physical activity"},
+        {"% adults >300 min/week moderate aerobic or equivalent", "Percent of adults who achieve at least 300 minutes a week of moderate-intensity aerobic physical activity or 150 minutes a week of vigorous-intensity aerobic activity (or an equivalent combination)"},
+        {"% adults >150 min/week moderate aerobic or equivalent", "Percent of adults who achieve at least 150 minutes a week of moderate-intensity aerobic physical activity or 75 minutes a week of vigorous-intensity aerobic activity (or an equivalent combination)"},
+        {"% adults 2+ day/week strength activities", "Percent of adults who engage in muscle-strengthening activities on 2 or more days a week"},
+        {"% adults >150 min/week and 2+ strength activities or equivalent", "Percent of adults who achieve at least 150 minutes a week of moderate-intensity aerobic physical activity or 75 minutes a week of vigorous-intensity aerobic physical activity and engage in muscle-strengthening activities on 2 or more days a week"},
+        {"% overweight adults", "Percent of adults aged 18 years and older who have an overweight classification"},
+        {"% adults with obesity", "Percent of adults aged 18 years and older who have obesity"},
+        {"% adults eat fruit < 1/day ", "Percent of adults who report consuming fruit less than one time daily"},
+        {"% adults eat vegetables < 1/day", "Percent of adults who report consuming vegetables less than one time daily"},
+        };
+    std::vector<sf::Text> questionTexts;
+    float i = 0;
+    for (const auto& questionPair : questions) {
+        sf::Text question(font, questionPair.first, 16);
+        question.setPosition(sf::Vector2f(20.f, 20.f + (22.f * i)));
+        question.setFillColor(sf::Color::Green);
+        questionTexts.push_back(question);
+        i++;
+    }
+    bool questionsVisible = true;
+    std::string chosenQuestion = "";
+
+    // Display States
+    std::vector<std::string> states;
+    std::vector<sf::Text> stateTexts;
+    bool statesVisible = false;
+    std::string chosenState = "";
+
+    // Display Results
+    std::vector<sf::Text> results;
+    bool resultsVisible = false;
+
+    // Restart query
+    sf::Text restart(font, "Search again", 16);
+    restart.setFillColor(sf::Color::Green);
+    restart.setPosition(sf::Vector2(20.f, 140.f));
+
+    window = sf::RenderWindow(sf::VideoMode(sf::Vector2u(700, 240)), "General Nutritional Biases");
+
+    // the rendering loop
+    while (window.isOpen()) {
+        while (const std::optional event = window.pollEvent()) {
+            if (event->is<sf::Event::Closed>()) {
+                window.close();
+                return 0;
+            }
+            if (isButtonPressed(sf::Mouse::Button::Left)) {
+                /// get the local mouse position (relative to a window)
+                sf::Vector2i localPosition = sf::Mouse::getPosition(window);
+                if (questionsVisible) {
+                    for (int i = 0; i < questionTexts.size(); i++) {
+                        if (questionTexts[i].getGlobalBounds().contains(sf::Vector2<float>(localPosition))) {
+                            questionsVisible = false;
+                            chosenQuestion = questions[i].second;
+
+                            // Display states
+                            states.clear();
+                            stateTexts.clear();
+                            statesVisible = true;
+                            states = hashtable->searchStates(chosenQuestion);
+                            std::sort(states.begin(), states.end());
+                            for (int i = 0; i < states.size(); i++) {
+                                sf::Text state(font, states[i], 16);
+                                state.setPosition(sf::Vector2f(120.f + (50.f * static_cast<float>(i % 10)), 20.f + (35.f * static_cast<float>(i / 10))));
+                                state.setFillColor(sf::Color::Green);
+                                stateTexts.push_back(state);
+                            }
+                        }
+                    }
+                } else if (statesVisible) {
+                    for (int i = 0; i < states.size(); i++) {
+                        if (stateTexts[i].getGlobalBounds().contains(sf::Vector2f(localPosition))) {
+                            statesVisible = false;
+                            chosenState = states[i];
+
+                            // Display results
+                            results.clear();
+                            resultsVisible = true;
+                            std::vector<float> data = hashtable->search(chosenQuestion, chosenState);
+                            if (data.empty()) {
+                                std::cout << "There is no data for this query.\n";
+                                break;
+                            }
+
+                            float min = data[0];
+                            float max = data[0];
+                            float sum = 0;
+                            for (auto elem : data) {
+                                if (elem < min)
+                                    min = elem;
+                                if (elem > max)
+                                    max = elem;
+                                sum += elem;
+                            }
+
+                            std::stringstream ss;
+                            ss << "Average: " << std::fixed << std::setprecision(2) << sum / data.size();
+                            sf::Text average(font, ss.str(), 16);
+                            average.setPosition(sf::Vector2(20.f, 20.f));
+                            results.push_back(average);
+
+                            ss = std::stringstream();
+                            ss << "Minimum value: " << std::fixed << std::setprecision(2) << min;
+                            sf::Text minimum(font, ss.str(), 16);
+                            minimum.setPosition(sf::Vector2(20.f, 50.f));
+                            results.push_back(minimum);
+
+                            ss = std::stringstream();
+                            ss << "Maximum value: " << std::fixed << std::setprecision(2) << max;
+                            sf::Text maximum(font, ss.str(), 16);
+                            maximum.setPosition(sf::Vector2(20.f, 80.f));
+                            results.push_back(maximum);
+
+                            ss = std::stringstream();
+                            ss << "Sample size: " << std::fixed << std::setprecision(2) << data.size();
+                            sf::Text sampleSize(font, ss.str(), 16);
+                            sampleSize.setPosition(sf::Vector2(20.f, 110.f));
+                            results.push_back(sampleSize);
+                        }
+                    }
+                } else if (resultsVisible) {
+                    if (restart.getGlobalBounds().contains(sf::Vector2f(localPosition))) {
+                        // Display questions
+                        resultsVisible = false;
+                        questionsVisible = true;
+                        std::cout << "restarting\n";
+                    }
+                }
+            }
+        }
+
+        window.clear();
+
+        if (questionsVisible) {
+            for (const auto& question : questionTexts) {
+                window.draw(question);
+            }
+        } else if (statesVisible) {
+            for (const auto& state : stateTexts) {
+                window.draw(state);
+            }
+        } else if (resultsVisible) {
+            for (auto result : results) {
+                window.draw(result);
+            }
+            window.draw(restart);
+        }
+
+        window.display();
     }
 
+    /*if (worker.joinable()) {
+        worker.join();
+    }*/
+
     // Query
+    /*
     while (true) {
         std::vector<std::string> questions = {
             "Percent of adults who engage in no leisure-time physical activity",
@@ -144,22 +284,24 @@ int main() {
             "Percent of adults who report consuming vegetables less than one time daily",
             };
 
-        std::string question = verifyOption("Question", questions);
+        std::string question = "Percent of adults who engage in no leisure-time physical activity"; //verifyOption("Question", questions);
         if (question.empty()) {
             break;
         }
 
         std::vector<std::string> states = hashtable->searchStates(question);
         std::sort(states.begin(), states.end());
-        std::string state = verifyOption("State", states, 2);
+        std::string state = "AK"; //verifyOption("State", states, 2);
         if (state.empty()) {
             continue;
         }
-        std::vector<float> result = hashtable->search(question, state);
+
+
+        std::vector<float> result = hashtable->search(chosenQuestion, chosenState);
 
         // Print result
-        std::cout << question << "\n\t" << state << "\n";
-        /*
+        std::cout << chosenQuestion << "\n\t" << chosenState << "\n";
+
         for (int i = 0; i < result.size(); i++) {
             if (i == 0) {
                 std::cout << std::fixed << std::setprecision(2) << result[i];
@@ -170,10 +312,11 @@ int main() {
             }
         }
         std::cout << ">" << "\n";
-        */
-        printDataAnalysis(result);
+
+        rintDataAnalysis(result);
         std::cout << std::endl;
-    }
+    //}
+*/
 
     std::cout << "Goodbye!" << std::endl;
 
@@ -185,3 +328,4 @@ int main() {
 
 // Todo: add timing
 // Todo: add tests
+// Todo: add other hashtables
