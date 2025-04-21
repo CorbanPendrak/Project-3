@@ -17,6 +17,9 @@ sf::Color buttonColor = sf::Color(0, 119, 182);
 sf::Color textColor = sf::Color(0, 180, 216);
 sf::Color backgroundColor = sf::Color(202, 240, 248);
 
+bool isMouseOver(const sf::Text& text, const sf::Vector2i& mousePos) {
+    return text.getGlobalBounds().contains(sf::Vector2f(mousePos));
+}
 
 int chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
     window = sf::RenderWindow(sf::VideoMode(sf::Vector2u(320, 120)), "Choose Hash Table");
@@ -36,6 +39,8 @@ int chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
     orderedMapTable.setFillColor(buttonColor);
     orderedMapTable.setPosition(sf::Vector2f(20, 80));
 
+
+
     sf::Clock timer;
 
     while (window.isOpen()) {
@@ -44,6 +49,37 @@ int chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
                 window.close();
                 return 1;
             }
+            // Get the current mouse position
+            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+            // Check hover and apply the glow effect
+            if (isMouseOver(basicHashTable, mousePos)) {
+                basicHashTable.setFillColor(sf::Color::Red); // Glow effect
+                basicHashTable.setOutlineColor(sf::Color::Black);
+                basicHashTable.setOutlineThickness(2); // Outline for the glow effect
+            } else {
+                basicHashTable.setFillColor(sf::Color(0, 119, 182));
+                basicHashTable.setOutlineThickness(0);
+            }
+
+            if (isMouseOver(linearProbingHashTable, mousePos)) {
+                linearProbingHashTable.setFillColor(sf::Color::Red); // Glow effect
+                linearProbingHashTable.setOutlineColor(sf::Color::Black);
+                linearProbingHashTable.setOutlineThickness(2); // Outline for the glow effect
+            } else {
+                linearProbingHashTable.setFillColor(sf::Color(0, 119, 182));
+                linearProbingHashTable.setOutlineThickness(0);
+            }
+
+            if (isMouseOver(orderedMapTable, mousePos)) {
+                orderedMapTable.setFillColor(sf::Color::Red); // Glow effect
+                orderedMapTable.setOutlineColor(sf::Color::Black);
+                orderedMapTable.setOutlineThickness(2); // Outline for the glow effect
+            } else {
+                orderedMapTable.setFillColor(sf::Color(0, 119, 182));
+                orderedMapTable.setOutlineThickness(0);
+            }
+
             if (isButtonPressed(sf::Mouse::Button::Left)) {
                 sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
                 if (basicHashTable.getGlobalBounds().contains(sf::Vector2f(mousePosition))) {
