@@ -79,3 +79,7 @@ Here are the steps for programming. Please follow them to ensure consistent code
   - [ ] Setup code coverage
 - [ ] Program flow design
 - [x] Create progress bar GUI element
+- [x] Create GUI
+  - [x] Create basic blocks
+  - [x] Handle mouse input
+  - [x] Choose hash table
