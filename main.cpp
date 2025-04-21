@@ -54,8 +54,8 @@ int chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
 
             // Check hover and apply the glow effect
             if (isMouseOver(basicHashTable, mousePos)) {
-                basicHashTable.setFillColor(sf::Color::Red); // Glow effect
-                basicHashTable.setOutlineColor(sf::Color::Black);
+                basicHashTable.setFillColor(sf::Color::Magenta); // Glow effect
+                basicHashTable.setOutlineColor(sf::Color::Transparent);
                 basicHashTable.setOutlineThickness(2); // Outline for the glow effect
             } else {
                 basicHashTable.setFillColor(sf::Color(0, 119, 182));
@@ -63,8 +63,8 @@ int chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
             }
 
             if (isMouseOver(linearProbingHashTable, mousePos)) {
-                linearProbingHashTable.setFillColor(sf::Color::Red); // Glow effect
-                linearProbingHashTable.setOutlineColor(sf::Color::Black);
+                linearProbingHashTable.setFillColor(sf::Color::Magenta); // Glow effect
+                linearProbingHashTable.setOutlineColor(sf::Color::Transparent);
                 linearProbingHashTable.setOutlineThickness(2); // Outline for the glow effect
             } else {
                 linearProbingHashTable.setFillColor(sf::Color(0, 119, 182));
@@ -72,8 +72,8 @@ int chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
             }
 
             if (isMouseOver(orderedMapTable, mousePos)) {
-                orderedMapTable.setFillColor(sf::Color::Red); // Glow effect
-                orderedMapTable.setOutlineColor(sf::Color::Black);
+                orderedMapTable.setFillColor(sf::Color::Magenta); // Glow effect
+                orderedMapTable.setOutlineColor(sf::Color::Transparent);
                 orderedMapTable.setOutlineThickness(2); // Outline for the glow effect
             } else {
                 orderedMapTable.setFillColor(sf::Color(0, 119, 182));
@@ -147,6 +147,15 @@ int loadDataset(HashTable*& hashtable, sf::RenderWindow& window) {
                         loadButton.setFillColor(textColor);
                     }
                 }
+            }
+            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+            if (isMouseOver(loadButton, mousePos)) {
+                loadButton.setFillColor(sf::Color::Magenta);
+                loadButton.setOutlineColor(sf::Color::Transparent);
+                loadButton.setOutlineThickness(2);
+            } else {
+                loadButton.setFillColor(buttonColor);
+                loadButton.setOutlineThickness(0);
             }
 
             window.clear(backgroundColor);
@@ -354,16 +363,43 @@ int main() {
         window.clear(backgroundColor);
 
         if (questionsVisible) {
-            for (const auto& question : questionTexts) {
+            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+            for (auto& question : questionTexts) {
+                if (isMouseOver(question, mousePos)) {
+                    question.setFillColor(sf::Color::Magenta);
+                    question.setOutlineColor(sf::Color::Transparent);
+                    question.setOutlineThickness(2);
+                } else {
+                    question.setFillColor(buttonColor);
+                    question.setOutlineThickness(0);
+                }
                 window.draw(question);
             }
         } else if (statesVisible) {
-            for (const auto& state : stateTexts) {
+            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+            for (auto& state : stateTexts) {
+                if (isMouseOver(state, mousePos)) {
+                    state.setFillColor(sf::Color::Magenta);
+                    state.setOutlineColor(sf::Color::Transparent);
+                    state.setOutlineThickness(2);
+                } else {
+                    state.setFillColor(buttonColor);
+                    state.setOutlineThickness(0);
+                }
                 window.draw(state);
             }
         } else if (resultsVisible) {
             for (const auto& result : results) {
                 window.draw(result);
+            }
+            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+            if (isMouseOver(restart, mousePos)) {
+                restart.setFillColor(sf::Color::Magenta);
+                restart.setOutlineColor(sf::Color::Transparent);
+                restart.setOutlineThickness(2);
+            } else {
+                restart.setFillColor(buttonColor);
+                restart.setOutlineThickness(0);
             }
             window.draw(restart);
         }
