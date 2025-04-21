@@ -215,7 +215,7 @@ int main() {
                 /// get the local mouse position (relative to a window)
                 sf::Vector2i localPosition = sf::Mouse::getPosition(window);
                 if (questionsVisible) {
-                    for (int i = 0; i < questionTexts.size(); i++) {
+                    for (int i = 0; i < static_cast<int>(questionTexts.size()); i++) {
                         if (questionTexts[i].getGlobalBounds().contains(sf::Vector2<float>(localPosition))) {
                             questionsVisible = false;
                             chosenQuestion = questions[i].second;
@@ -238,7 +238,7 @@ int main() {
                         }
                     }
                 } else if (statesVisible) {
-                    for (int i = 0; i < states.size(); i++) {
+                    for (int i = 0; i < static_cast<int>(states.size()); i++) {
                         if (stateTexts[i].getGlobalBounds().contains(sf::Vector2f(localPosition))) {
                             statesVisible = false;
                             chosenState = states[i];
@@ -326,7 +326,7 @@ int main() {
                 window.draw(state);
             }
         } else if (resultsVisible) {
-            for (auto result : results) {
+            for (const auto& result : results) {
                 window.draw(result);
             }
             window.draw(restart);
@@ -334,59 +334,6 @@ int main() {
 
         window.display();
     }
-
-    /*if (worker.joinable()) {
-        worker.join();
-    }*/
-
-    // Query
-    /*
-    while (true) {
-        std::vector<std::string> questions = {
-            "Percent of adults who engage in no leisure-time physical activity",
-            "Percent of adults who achieve at least 300 minutes a week of moderate-intensity aerobic physical activity or 150 minutes a week of vigorous-intensity aerobic activity (or an equivalent combination)",
-            "Percent of adults who achieve at least 150 minutes a week of moderate-intensity aerobic physical activity or 75 minutes a week of vigorous-intensity aerobic activity (or an equivalent combination)",
-            "Percent of adults who engage in muscle-strengthening activities on 2 or more days a week",
-            "Percent of adults who achieve at least 150 minutes a week of moderate-intensity aerobic physical activity or 75 minutes a week of vigorous-intensity aerobic physical activity and engage in muscle-strengthening activities on 2 or more days a week",
-            "Percent of adults aged 18 years and older who have an overweight classification",
-            "Percent of adults aged 18 years and older who have obesity",
-            "Percent of adults who report consuming fruit less than one time daily",
-            "Percent of adults who report consuming vegetables less than one time daily",
-            };
-
-        std::string question = "Percent of adults who engage in no leisure-time physical activity"; //verifyOption("Question", questions);
-        if (question.empty()) {
-            break;
-        }
-
-        std::vector<std::string> states = hashtable->searchStates(question);
-        std::sort(states.begin(), states.end());
-        std::string state = "AK"; //verifyOption("State", states, 2);
-        if (state.empty()) {
-            continue;
-        }
-
-
-        std::vector<float> result = hashtable->search(chosenQuestion, chosenState);
-
-        // Print result
-        std::cout << chosenQuestion << "\n\t" << chosenState << "\n";
-
-        for (int i = 0; i < result.size(); i++) {
-            if (i == 0) {
-                std::cout << std::fixed << std::setprecision(2) << result[i];
-            } else if (i % 20 == 0) {
-                std::cout << ",\n\t\t " << std::fixed << std::setprecision(2) <<  result[i];
-            } else {
-                std::cout << ", " << std::fixed << std::setprecision(2) << result[i];
-            }
-        }
-        std::cout << ">" << "\n";
-
-        rintDataAnalysis(result);
-        std::cout << std::endl;
-    //}
-*/
 
     std::cout << "Goodbye!" << std::endl;
 
