@@ -11,23 +11,29 @@
 #include "LinearProbingHashTable.h"
 #include "OrderedMapTable.h"
 
+
+sf::Font font("MonaspaceXenon-Regular.otf");
+sf::Color buttonColor = sf::Color(0, 119, 182);
+sf::Color textColor = sf::Color(0, 180, 216);
+sf::Color backgroundColor = sf::Color(202, 240, 248);
+
+
 int chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
     window = sf::RenderWindow(sf::VideoMode(sf::Vector2u(320, 120)), "Choose Hash Table");
-    sf::Font font("MonaspaceXenon-Regular.otf");
 
     // Basic Hash Table
     sf::Text basicHashTable(font, "Basic Hash Table", 24);
-    basicHashTable.setFillColor(sf::Color::Green);
+    basicHashTable.setFillColor(buttonColor);
     basicHashTable.setPosition(sf::Vector2f(20, 20));
 
     // Linear Probing Hash Table
     sf::Text linearProbingHashTable(font, "Linear Probing Hash Table", 24);
-    linearProbingHashTable.setFillColor(sf::Color::Green);
+    linearProbingHashTable.setFillColor(buttonColor);
     linearProbingHashTable.setPosition(sf::Vector2f(20, 50));
 
     // Ordered Map Table
     sf::Text orderedMapTable(font, "Ordered Map Table", 24);
-    orderedMapTable.setFillColor(sf::Color::Green);
+    orderedMapTable.setFillColor(buttonColor);
     orderedMapTable.setPosition(sf::Vector2f(20, 80));
 
     sf::Clock timer;
@@ -53,7 +59,7 @@ int chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
             }
         }
 
-        window.clear();
+        window.clear(backgroundColor);
         window.draw(basicHashTable);
         window.draw(linearProbingHashTable);
         window.draw(orderedMapTable);
@@ -68,12 +74,11 @@ int loadDataset(HashTable*& hashtable, sf::RenderWindow& window) {
         // Load Dataset
         window = sf::RenderWindow(sf::VideoMode(sf::Vector2u(230, 120)), "Load dataset");
 
-        sf::Font font("MonaspaceXenon-Regular.otf");
         sf::Clock timer;
 
         // Buttons
         sf::Text loadButton(font, "Load Database", 24);
-        loadButton.setFillColor(sf::Color::Green);
+        loadButton.setFillColor(buttonColor);
         loadButton.setPosition(sf::Vector2f(20, 20));
         sf::Clock loadedClock;
         loadedClock.stop();
@@ -84,7 +89,7 @@ int loadDataset(HashTable*& hashtable, sf::RenderWindow& window) {
         bool loadedDataset = false;
         hashtable->progressBar->setSize(150, 50);
         hashtable->progressBar->setPosition(40, 60);
-        hashtable->progressBar->setColor(sf::Color::White, sf::Color::Transparent);
+        hashtable->progressBar->setColor(textColor, backgroundColor);
 
         // the rendering loop
         while (window.isOpen())
@@ -103,12 +108,12 @@ int loadDataset(HashTable*& hashtable, sf::RenderWindow& window) {
                         std::thread worker([&]() {hashtable->load(progress, fileName);});
                         worker.detach();
                         loadedDataset = true;
-                        loadButton.setFillColor(sf::Color::White);
+                        loadButton.setFillColor(textColor);
                     }
                 }
             }
 
-            window.clear();
+            window.clear(backgroundColor);
 
             // Display progress bar
             if (loadedClock.getElapsedTime().asSeconds() >= 1) {
@@ -139,7 +144,6 @@ int loadDataset(HashTable*& hashtable, sf::RenderWindow& window) {
 int main() {
     std::string fileName = "Nutrition__Physical_Activity__and_Obesity_-_Behavioral_Risk_Factor_Surveillance_System.csv";
     bool devMode = true;
-    sf::Font font("MonaspaceXenon-Regular.otf");
 
     HashTable* hashtable = nullptr;
     sf::RenderWindow window;
@@ -173,7 +177,7 @@ int main() {
     for (const auto& questionPair : questions) {
         sf::Text question(font, questionPair.first, 16);
         question.setPosition(sf::Vector2f(20.f, 20.f + (22.f * j)));
-        question.setFillColor(sf::Color::Green);
+        question.setFillColor(buttonColor);
         questionTexts.push_back(question);
         j++;
     }
@@ -193,7 +197,7 @@ int main() {
 
     // Restart query
     sf::Text restart(font, "Search again", 16);
-    restart.setFillColor(sf::Color::Green);
+    restart.setFillColor(buttonColor);
     restart.setPosition(sf::Vector2(20.f, 160.f));
 
     // Timer
@@ -227,7 +231,7 @@ int main() {
                             for (int i = 0; i < states.size(); i++) {
                                 sf::Text state(font, states[i], 16);
                                 state.setPosition(sf::Vector2f(20.f + (50.f * static_cast<float>(i % 10)), 20.f + (35.f * static_cast<float>(i / 10))));
-                                state.setFillColor(sf::Color::Green);
+                                state.setFillColor(buttonColor);
                                 stateTexts.push_back(state);
                             }
                             std::cout << "Found states in " << std::fixed << std::setprecision(5) << timer.getElapsedTime().asSeconds() << " seconds.\n";
@@ -262,34 +266,40 @@ int main() {
 
                             sf::Text question(font, chosenQuestionNice, 16);
                             question.setPosition(sf::Vector2(20.f, 20.f));
+                            question.setFillColor(textColor);
                             results.push_back(question);
 
                             sf::Text state(font, chosenState, 16);
                             state.setPosition(sf::Vector2(20.f, 40.f));
+                            state.setFillColor(textColor);
                             results.push_back(state);
 
                             std::stringstream ss;
                             ss << "Average: " << std::fixed << std::setprecision(2) << sum / data.size();
                             sf::Text average(font, ss.str(), 16);
                             average.setPosition(sf::Vector2(20.f, 80.f));
+                            average.setFillColor(textColor);
                             results.push_back(average);
 
                             ss = std::stringstream();
                             ss << "Minimum value: " << std::fixed << std::setprecision(2) << min;
                             sf::Text minimum(font, ss.str(), 16);
                             minimum.setPosition(sf::Vector2(20.f, 100.f));
+                            minimum.setFillColor(textColor);
                             results.push_back(minimum);
 
                             ss = std::stringstream();
                             ss << "Maximum value: " << std::fixed << std::setprecision(2) << max;
                             sf::Text maximum(font, ss.str(), 16);
                             maximum.setPosition(sf::Vector2(20.f, 120.f));
+                            maximum.setFillColor(textColor);
                             results.push_back(maximum);
 
                             ss = std::stringstream();
                             ss << "Sample size: " << std::fixed << std::setprecision(2) << data.size();
                             sf::Text sampleSize(font, ss.str(), 16);
                             sampleSize.setPosition(sf::Vector2(20.f, 140.f));
+                            sampleSize.setFillColor(textColor);
                             results.push_back(sampleSize);
 
                             std::cout << "Found results in " << std::fixed << std::setprecision(5) << timer.getElapsedTime().asSeconds() << " seconds.\n";
@@ -305,7 +315,7 @@ int main() {
             }
         }
 
-        window.clear();
+        window.clear(backgroundColor);
 
         if (questionsVisible) {
             for (const auto& question : questionTexts) {
