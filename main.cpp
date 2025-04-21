@@ -16,9 +16,24 @@ sf::Font font("MonaspaceXenon-Regular.otf");
 sf::Color buttonColor = sf::Color(0, 119, 182);
 sf::Color textColor = sf::Color(0, 180, 216);
 sf::Color backgroundColor = sf::Color(202, 240, 248);
+bool mousePressedFlag = false;         // Tracks if mouse was already pressed
+sf::Clock debounceClock;              // Measures time since last accepted click
+sf::Time debounceDelay = sf::milliseconds(250); // 250ms delay between clicks
 
 bool isMouseOver(const sf::Text& text, const sf::Vector2i& mousePos) {
     return text.getGlobalBounds().contains(sf::Vector2f(mousePos));
+}
+bool isClickEvent(bool& mousePressedFlag, sf::Clock& debounceClock, sf::Time debounceDelay) {
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+        if (!mousePressedFlag && debounceClock.getElapsedTime() > debounceDelay) {
+            mousePressedFlag = true;
+            debounceClock.restart();
+            return true;
+        }
+    } else {
+        mousePressedFlag = false;
+    }
+    return false;
 }
 
 int chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
@@ -42,6 +57,7 @@ int chooseHashTable(HashTable*& hashtable, sf::RenderWindow& window) {
 
 
     sf::Clock timer;
+
 
     while (window.isOpen()) {
         while (const std::optional event = window.pollEvent()) {
@@ -256,9 +272,9 @@ int main() {
             if (event->is<sf::Event::Closed>()) {
                 window.close();
             }
-            if (isButtonPressed(sf::Mouse::Button::Left)) {
-                /// get the local mouse position (relative to a window)
+            if (isClickEvent(mousePressedFlag, debounceClock, debounceDelay)) {
                 sf::Vector2i localPosition = sf::Mouse::getPosition(window);
+                sf::Vector2f localPosF(static_cast<float>(localPosition.x), static_cast<float>(localPosition.y));
                 if (questionsVisible) {
                     for (int i = 0; i < static_cast<int>(questionTexts.size()); i++) {
                         if (questionTexts[i].getGlobalBounds().contains(sf::Vector2<float>(localPosition))) {
