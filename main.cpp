@@ -432,4 +432,3 @@ int main() {
 
 
 // Todo: add tests
-// Todo: add other hashtables

@@ -30,24 +30,6 @@ We use the U.S. Department of Health & Human Services Nutritional Dataset.
 
 ![](./Docs/COP3530-Project3-Wireframe.png)
 
-## How are we going to do this?
-Preliminary algorithms or data structures we may want to implement and how we represent the data.
-- Concurrent vs nonconcerrent
-- Merge vs quick vs heap sort vs sleep sort
-- Load data using selected algorithm into objects and sort by question and state
-
-## Who is going to do what?
-
-- Design program flow: **All**
-- Design abstract base class: **Corban**
-- Create main method: **All**
-- Create merge sort: **Adan**
-- Create quick sort: **Corban**
-- Create heap sort: **Timmy**
-- Create sleep sort: **Corban**
-- Create UI: **All**
-- Connect UI to methods: **All**
-
 ## Code Flow
 
 Here are the steps for programming. Please follow them to ensure consistent code across the repository.
@@ -64,22 +46,5 @@ Here are the steps for programming. Please follow them to ensure consistent code
    2. Check code coverage
 5. Merge your code into the `master` branch
 
-## Tasks
-
-- [x] Create GitHub repository @CorbanPendrak
-  - [x] Document repository @CorbanPendrak
-  - [x] Style repository @CorbanPendrak
-  - [x] Describe code flow
-  - [x] Welcome comments
-- [ ] Setup Dependencies
-  - [x] Setup SFML @CorbanPendrak
-  - [ ] Precommit hook to reformat code
-  - [x] Setup Catch
-  - [x] Create SFML Catch test
-  - [ ] Setup code coverage
-- [ ] Program flow design
-- [x] Create progress bar GUI element
-- [x] Create GUI
-  - [x] Create basic blocks
-  - [x] Handle mouse input
-  - [x] Choose hash table
+## Running the Project
+To run this project, build with the Project_3 executable detailed in CMakeLists.txt
